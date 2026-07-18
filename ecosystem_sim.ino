@@ -189,8 +189,24 @@ void spawnDecomp(float x, float y) {
   }
 }
 
+
+// --- Fast Inverse Square Root (Quake 3) ---
+float Q_rsqrt( float number ) {
+  long i;
+  float x2, y;
+  const float threehalfs = 1.5F;
+  x2 = number * 0.5F;
+  y  = number;
+  i  = * ( long * ) &y;
+  i  = 0x5f3759df - ( i >> 1 );
+  y  = * ( float * ) &i;
+  y  = y * ( threehalfs - ( x2 * y * y ) );
+  return y;
+}
+
 // ==========================================
 // Core 0 Task: Apex Predator
+
 // ==========================================
 void core0Task(void * pvParameters) {
   for(;;) {
@@ -249,20 +265,20 @@ void core0Task(void * pvParameters) {
 
       if(targetG != -1) {
         float dx = garbages[targetG].x - decomps[i].x; float dy = garbages[targetG].y - decomps[i].y;
-        float mag = sqrt(dx*dx + dy*dy);
-        if(mag > 0) { decomps[i].vx = (decomps[i].vx * 0.95) + ((dx/mag) * 0.1); decomps[i].vy = (decomps[i].vy * 0.95) + ((dy/mag) * 0.1); }
+        float distSq = dx*dx + dy*dy;
+        if(distSq > 0) { float invMag = Q_rsqrt(distSq); decomps[i].vx = (decomps[i].vx * 0.95) + (dx*invMag * 0.1); decomps[i].vy = (decomps[i].vy * 0.95) + (dy*invMag * 0.1); }
         if(minDist < 36) { garbages[targetG].active = false; decomps[i].energy += 20; decomps[i].flash = 1.0; }
       } else if(targetS != -1) {
         float dx = spores[targetS].x - decomps[i].x; float dy = spores[targetS].y - decomps[i].y;
-        float mag = sqrt(dx*dx + dy*dy);
-        if(mag > 0) { decomps[i].vx = (decomps[i].vx * 0.95) + ((dx/mag) * 0.1); decomps[i].vy = (decomps[i].vy * 0.95) + ((dy/mag) * 0.1); }
+        float distSq = dx*dx + dy*dy;
+        if(distSq > 0) { float invMag = Q_rsqrt(distSq); decomps[i].vx = (decomps[i].vx * 0.95) + (dx*invMag * 0.1); decomps[i].vy = (decomps[i].vy * 0.95) + (dy*invMag * 0.1); }
         if(minDist < 36) { spores[targetS].active = false; decomps[i].energy += 20; decomps[i].flash = 1.0; }
       } else {
         decomps[i].vx += (random(0, 100)/500.0) - 0.1; decomps[i].vy += (random(0, 100)/500.0) - 0.1;
       }
       
-      float speed = sqrt(decomps[i].vx*decomps[i].vx + decomps[i].vy*decomps[i].vy);
-      if(speed > 0.7) { decomps[i].vx = (decomps[i].vx/speed)*0.7; decomps[i].vy = (decomps[i].vy/speed)*0.7; }
+      float speedSq = decomps[i].vx*decomps[i].vx + decomps[i].vy*decomps[i].vy;
+      if(speedSq > 0.49) { float invSpeed = Q_rsqrt(speedSq); decomps[i].vx = decomps[i].vx*invSpeed*0.7; decomps[i].vy = decomps[i].vy*invSpeed*0.7; }
       decomps[i].x += decomps[i].vx; decomps[i].y += decomps[i].vy;
       
       if(decomps[i].x < 0) { decomps[i].x = 0; decomps[i].vx *= -1; }
