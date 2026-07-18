@@ -1,5 +1,9 @@
 # ESP32 Micro Ecosystem Simulator 🌱🐟🦈🐉
 
+### Real Hardware (ESP32 + 1.9" TFT)
+![Real ESP32 Hardware](esp32_hardware_demo.gif)
+
+### Python Simulator
 ![Ecosystem Animation](ecosystem_anim_v2.gif)
 
 A highly optimized, high-performance artificial life / ecosystem simulation designed to run on the ESP32 and a 1.9" TFT display (ST7789). Watch a completely autonomous, pixel-perfect ecosystem unfold in the palm of your hand!
