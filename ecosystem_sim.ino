@@ -461,11 +461,15 @@ void core0Task(void * pvParameters) {
         }
         
         if(minDist < 36) { 
-          herbs[carns[i].targetId].active = false;
-          carns[i].energy += 60; carns[i].flash = 1.0; 
-          spawnExplosion(herbs[carns[i].targetId].x, herbs[carns[i].targetId].y, 0, 255, 255, 10, 1.0); // 捕食エフェクト
-          spawnGarbage(herbs[carns[i].targetId].x, herbs[carns[i].targetId].y, 0, 255, 255);
-          if(herbs[carns[i].targetId].infected) spawnSpore(carns[i].x, carns[i].y); 
+          // 食いつき処理（時間をかけて捕食）
+          herbs[carns[i].targetId].energy -= 2.5; 
+          carns[i].energy += 2.5; 
+          carns[i].flash = 1.0; 
+          // 噛み付いている間は両者とも足が遅くなる
+          carns[i].vx *= 0.5; carns[i].vy *= 0.5;
+          herbs[carns[i].targetId].vx *= 0.2; herbs[carns[i].targetId].vy *= 0.2;
+          // 血飛沫（たまに出る）
+          if(random(0,100) < 30) spawnExplosion(herbs[carns[i].targetId].x, herbs[carns[i].targetId].y, 0, 255, 255, 1, 0.4);
         }
       } else {
         carns[i].vx += (random(0, 100)/500.0) - 0.1; carns[i].vy += (random(0, 100)/500.0) - 0.1;
@@ -529,11 +533,14 @@ void core0Task(void * pvParameters) {
           apex[i].vy = (apex[i].vy * 0.98) + ((dy/mag) * 0.12);
         }
         if(minDist < 64) { 
-          carns[apex[i].targetId].active = false;
-          apex[i].energy += 120;
+          // 頂点捕食者の食いつき処理
+          carns[apex[i].targetId].energy -= 5.0; 
+          apex[i].energy += 5.0;
           apex[i].flash = 1.0;
-          spawnExplosion(carns[apex[i].targetId].x, carns[apex[i].targetId].y, 255, 50, 150, 15, 1.5); // 肉食動物のピンク爆発
-          spawnGarbage(carns[apex[i].targetId].x, carns[apex[i].targetId].y, 255, 50, 150);
+          // 丸呑みではなく、少しもみ合いになる
+          apex[i].vx *= 0.6; apex[i].vy *= 0.6;
+          carns[apex[i].targetId].vx *= 0.1; carns[apex[i].targetId].vy *= 0.1;
+          if(random(0,100) < 40) spawnExplosion(carns[apex[i].targetId].x, carns[apex[i].targetId].y, 255, 50, 150, 2, 0.6); 
         }
       } else {
         apex[i].vx += (random(0, 100)/500.0) - 0.1; apex[i].vy += (random(0, 100)/500.0) - 0.1;
