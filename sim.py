@@ -31,12 +31,13 @@ APEX_REP_COST = 200.0
 APEX_EAT_GAIN = 120.0
 
 class Entity:
-    def __init__(self, x, y, energy, infected=False):
+    def __init__(self, x, y, energy, speed_limit=1.0, infected=False):
         self.x = x
         self.y = y
         self.vx = random.uniform(-1, 1)
         self.vy = random.uniform(-1, 1)
         self.energy = energy
+        self.speed_limit = speed_limit
         self.infected = infected
 
 class Plant:
@@ -83,13 +84,13 @@ def sim_step():
         spores.append(Spore(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10)))
 
     if len(herbs) < 5 and random.random() < 0.01:
-        herbs.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 80))
+        herbs.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 80, 0.8))
     if len(carns) < 2 and len(herbs) > 20 and random.random() < 0.01:
-        carns.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 100))
+        carns.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 100, 1.1))
     if len(apexs) < 1 and len(carns) > 6 and random.random() < 0.01:
-        apexs.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 300))
+        apexs.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 300, 1.5))
     if len(decomps) < 3 and random.random() < 0.01:
-        decomps.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 80))
+        decomps.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 80, 0.7))
 
     # Decomposers
     new_decomps = []
@@ -225,7 +226,7 @@ def sim_step():
             h.energy -= 0.15
             
         speed = math.sqrt(h.vx**2 + h.vy**2)
-        limit = 1.2 if h.infected else 0.8
+        limit = h.speed_limit + 0.4 if h.infected else h.speed_limit
         if speed > limit:
             h.vx = (h.vx/speed)*limit
             h.vy = (h.vy/speed)*limit
@@ -237,12 +238,12 @@ def sim_step():
         if h.y < 0: h.y=0; h.vy*=-1
         if h.y > HEIGHT: h.y=HEIGHT; h.vy*=-1
         
-        h.energy -= HERB_DRAIN
+        h.energy -= HERB_DRAIN * (h.speed_limit / 0.8)
         
         if h.energy > 0:
             if h.energy > HERB_REP_THRESH and not h.infected and len(herbs)+len(new_herbs) < MAX_HERBS:
                 h.energy -= HERB_REP_COST
-                new_herbs.append(Entity(h.x, h.y, 80))
+                new_herbs.append(Entity(h.x, h.y, 80, max(0.3, min(2.0, h.speed_limit + random.uniform(-0.1, 0.1)))))
             new_herbs.append(h)
         else:
             spawn_garbage(h.x, h.y)
@@ -294,7 +295,7 @@ def sim_step():
                     c.vy += (dy/mag)*0.3
                     
         speed = math.sqrt(c.vx**2 + c.vy**2)
-        limit = 1.7 if escaping else 1.1
+        limit = c.speed_limit + 0.6 if escaping else c.speed_limit
         if speed > limit:
             c.vx = (c.vx/speed)*limit
             c.vy = (c.vy/speed)*limit
@@ -306,12 +307,12 @@ def sim_step():
         if c.y < 0: c.y=0; c.vy*=-1
         if c.y > HEIGHT: c.y=HEIGHT; c.vy*=-1
         
-        c.energy -= CARN_DRAIN
+        c.energy -= CARN_DRAIN * (c.speed_limit / 1.1)
         
         if c.energy > 0:
             if c.energy > CARN_REP_THRESH and len(carns)+len(new_carns) < MAX_CARNS:
                 c.energy -= CARN_REP_COST
-                new_carns.append(Entity(c.x, c.y, 100))
+                new_carns.append(Entity(c.x, c.y, 100, max(0.5, min(2.5, c.speed_limit + random.uniform(-0.1, 0.1)))))
             new_carns.append(c)
         else:
             spawn_garbage(c.x, c.y)
@@ -347,9 +348,9 @@ def sim_step():
             a.vy += random.uniform(-0.1, 0.1)
             
         speed = math.sqrt(a.vx**2 + a.vy**2)
-        if speed > 1.5:
-            a.vx = (a.vx/speed)*1.5
-            a.vy = (a.vy/speed)*1.5
+        if speed > a.speed_limit:
+            a.vx = (a.vx/speed)*a.speed_limit
+            a.vy = (a.vy/speed)*a.speed_limit
             
         a.x += a.vx
         a.y += a.vy
@@ -358,12 +359,12 @@ def sim_step():
         if a.y < 0: a.y=0; a.vy*=-1
         if a.y > HEIGHT: a.y=HEIGHT; a.vy*=-1
         
-        a.energy -= APEX_DRAIN
+        a.energy -= APEX_DRAIN * (a.speed_limit / 1.5)
         
         if a.energy > 0:
             if a.energy > APEX_REP_THRESH and len(apexs)+len(new_apexs) < MAX_APEX:
                 a.energy -= APEX_REP_COST
-                new_apexs.append(Entity(a.x, a.y, 300))
+                new_apexs.append(Entity(a.x, a.y, 300, max(0.8, min(3.0, a.speed_limit + random.uniform(-0.1, 0.1)))))
             new_apexs.append(a)
         else:
             spawn_garbage(a.x, a.y)
@@ -371,9 +372,9 @@ def sim_step():
 
 def run_sim():
     for _ in range(40): plants.append(Plant(random.uniform(5, WIDTH-5), random.uniform(5, HEIGHT-5)))
-    for _ in range(25): herbs.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 80))
-    for _ in range(3): carns.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 100))
-    for _ in range(3): decomps.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 80))
+    for _ in range(25): herbs.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 80, 0.8))
+    for _ in range(3): carns.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 100, 1.1))
+    for _ in range(3): decomps.append(Entity(random.uniform(10, WIDTH-10), random.uniform(10, HEIGHT-10), 80, 0.7))
     
     hist_plants = []
     hist_herbs = []

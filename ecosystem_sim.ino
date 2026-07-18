@@ -41,7 +41,8 @@ struct Entity {
   int histIdx;
   float flash; 
   bool infected;
-  int targetId; // ターゲット追尾用（レーザーサイト描画）
+  int targetId;
+  float speedLimit;
 };
 
 struct Spore { bool active; float x, y, vx, vy; };
@@ -121,7 +122,7 @@ void spawnPlant() {
   }
 }
 
-void spawnHerb(float x, float y) {
+void spawnHerb(float x, float y, float pSpeed = 0.8) {
   for(int i=0; i<MAX_HERBS; i++) {
     if(!herbs[i].active) {
       herbs[i].active = true;
@@ -129,13 +130,16 @@ void spawnHerb(float x, float y) {
       herbs[i].y = (y == -1) ? random(10, TFT_HEIGHT-10) : y + random(-5, 5);
       herbs[i].vx = (random(0, 100) / 50.0) - 1.0; herbs[i].vy = (random(0, 100) / 50.0) - 1.0;
       herbs[i].energy = 80;
+      float newSpeed = pSpeed + (random(0, 200)/1000.0) - 0.1;
+      if(newSpeed < 0.3) newSpeed = 0.3; if(newSpeed > 2.0) newSpeed = 2.0;
+      herbs[i].speedLimit = newSpeed;
       initHistory(herbs[i], herbs[i].x, herbs[i].y);
       break;
     }
   }
 }
 
-void spawnCarn(float x, float y) {
+void spawnCarn(float x, float y, float pSpeed = 1.1) {
   for(int i=0; i<MAX_CARNS; i++) {
     if(!carns[i].active) {
       carns[i].active = true;
@@ -143,13 +147,16 @@ void spawnCarn(float x, float y) {
       carns[i].y = (y == -1) ? random(10, TFT_HEIGHT-10) : y + random(-5, 5);
       carns[i].vx = (random(0, 100) / 50.0) - 1.0; carns[i].vy = (random(0, 100) / 50.0) - 1.0;
       carns[i].energy = 100;
+      float newSpeed = pSpeed + (random(0, 200)/1000.0) - 0.1;
+      if(newSpeed < 0.5) newSpeed = 0.5; if(newSpeed > 2.5) newSpeed = 2.5;
+      carns[i].speedLimit = newSpeed;
       initHistory(carns[i], carns[i].x, carns[i].y);
       break;
     }
   }
 }
 
-void spawnApex(float x, float y) {
+void spawnApex(float x, float y, float pSpeed = 1.5) {
   for(int i=0; i<MAX_APEX; i++) {
     if(!apex[i].active) {
       apex[i].active = true;
@@ -157,6 +164,9 @@ void spawnApex(float x, float y) {
       apex[i].y = (y == -1) ? random(10, TFT_HEIGHT-10) : y + random(-5, 5);
       apex[i].vx = (random(0, 100) / 50.0) - 1.0; apex[i].vy = (random(0, 100) / 50.0) - 1.0;
       apex[i].energy = 300;
+      float newSpeed = pSpeed + (random(0, 200)/1000.0) - 0.1;
+      if(newSpeed < 0.8) newSpeed = 0.8; if(newSpeed > 3.0) newSpeed = 3.0;
+      apex[i].speedLimit = newSpeed;
       initHistory(apex[i], apex[i].x, apex[i].y);
       break;
     }
@@ -183,6 +193,7 @@ void spawnDecomp(float x, float y) {
       decomps[i].y = (y == -1) ? random(10, TFT_HEIGHT-10) : y + random(-5, 5);
       decomps[i].vx = (random(0, 100) / 50.0) - 1.0; decomps[i].vy = (random(0, 100) / 50.0) - 1.0;
       decomps[i].energy = 80;
+      decomps[i].speedLimit = 0.7;
       initHistory(decomps[i], decomps[i].x, decomps[i].y);
       break;
     }
@@ -410,7 +421,7 @@ void core0Task(void * pvParameters) {
         if(random(0,100)<10) spawnExplosion(herbs[i].x, herbs[i].y, 180, 0, 255, 1, 0.2); 
       }
 
-      float speedLimit = herbs[i].infected ? 1.2 : 0.8;
+      float speedLimit = herbs[i].infected ? herbs[i].speedLimit + 0.4 : herbs[i].speedLimit;
       float speed = sqrt(herbs[i].vx*herbs[i].vx + herbs[i].vy*herbs[i].vy);
       if(speed > speedLimit) { herbs[i].vx = (herbs[i].vx/speed)*speedLimit; herbs[i].vy = (herbs[i].vy/speed)*speedLimit; }
       
@@ -421,7 +432,7 @@ void core0Task(void * pvParameters) {
       if(herbs[i].y < 0) { herbs[i].y = 0; herbs[i].vy *= -1; }
       if(herbs[i].y > TFT_HEIGHT) { herbs[i].y = TFT_HEIGHT; herbs[i].vy *= -1; }
       
-      herbs[i].energy -= 0.04; 
+      herbs[i].energy -= 0.04 * (herbs[i].speedLimit / 0.8); 
       if(herbs[i].energy <= 0) {
         herbs[i].active = false;
         if(herbs[i].infected) {
@@ -434,7 +445,7 @@ void core0Task(void * pvParameters) {
         }
       } else if (herbs[i].energy > 120 && !herbs[i].infected) {
         herbs[i].energy -= 50;
-        spawnHerb(herbs[i].x, herbs[i].y);
+        spawnHerb(herbs[i].x, herbs[i].y, herbs[i].speedLimit);
       }
     }
 
@@ -488,7 +499,7 @@ void core0Task(void * pvParameters) {
         }
       }
       
-      float limit = escaping ? 1.7 : 1.1; // 逃走時はApex(1.5)より速く走る！
+      float limit = escaping ? carns[i].speedLimit + 0.6 : carns[i].speedLimit; // 逃走時はApex(1.5)より速く走る！
       float speed = sqrt(carns[i].vx*carns[i].vx + carns[i].vy*carns[i].vy);
       if(speed > limit) { carns[i].vx = (carns[i].vx/speed)*limit; carns[i].vy = (carns[i].vy/speed)*limit; }
       carns[i].x += carns[i].vx; carns[i].y += carns[i].vy;
@@ -498,14 +509,14 @@ void core0Task(void * pvParameters) {
       if(carns[i].y < 0) { carns[i].y = 0; carns[i].vy *= -1; }
       if(carns[i].y > TFT_HEIGHT) { carns[i].y = TFT_HEIGHT; carns[i].vy *= -1; }
       
-      carns[i].energy -= 0.06;
+      carns[i].energy -= 0.06 * (carns[i].speedLimit / 1.1);
       if(carns[i].energy <= 0) {
         carns[i].active = false;
         spawnExplosion(carns[i].x, carns[i].y, 255, 50, 150, 8, 0.8);
         spawnGarbage(carns[i].x, carns[i].y, 255, 50, 150);
       } else if (carns[i].energy > 150) {
         carns[i].energy -= 70;
-        spawnCarn(carns[i].x, carns[i].y);
+        spawnCarn(carns[i].x, carns[i].y, carns[i].speedLimit);
       }
     }
 
@@ -547,7 +558,7 @@ void core0Task(void * pvParameters) {
       }
       
       float speed = sqrt(apex[i].vx*apex[i].vx + apex[i].vy*apex[i].vy);
-      if(speed > 1.5) { apex[i].vx = (apex[i].vx/speed)*1.5; apex[i].vy = (apex[i].vy/speed)*1.5; }
+      if(speed > apex[i].speedLimit) { apex[i].vx = (apex[i].vx/speed)*apex[i].speedLimit; apex[i].vy = (apex[i].vy/speed)*apex[i].speedLimit; }
       apex[i].x += apex[i].vx; apex[i].y += apex[i].vy;
       
       if(apex[i].x < 0) { apex[i].x = 0; apex[i].vx *= -1; }
@@ -555,13 +566,13 @@ void core0Task(void * pvParameters) {
       if(apex[i].y < 0) { apex[i].y = 0; apex[i].vy *= -1; }
       if(apex[i].y > TFT_HEIGHT) { apex[i].y = TFT_HEIGHT; apex[i].vy *= -1; }
       
-      apex[i].energy -= 0.15; 
+      apex[i].energy -= 0.15 * (apex[i].speedLimit / 1.5); 
       if(apex[i].energy <= 0) {
         apex[i].active = false;
         spawnExplosion(apex[i].x, apex[i].y, 255, 215, 0, 15, 1.0);
         spawnGarbage(apex[i].x, apex[i].y, 255, 215, 0);
       }
-      else if (apex[i].energy > 500) { apex[i].energy -= 200; spawnApex(apex[i].x, apex[i].y); }
+      else if (apex[i].energy > 500) { apex[i].energy -= 200; spawnApex(apex[i].x, apex[i].y, apex[i].speedLimit); }
     }
     xSemaphoreGive(dataMutex);
     
