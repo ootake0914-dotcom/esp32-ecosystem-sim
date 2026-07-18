@@ -1,5 +1,7 @@
 # ESP32 Micro Ecosystem Simulator 🌱🐟🦈🐉
 
+![Ecosystem Animation](ecosystem_anim.gif)
+
 A highly optimized, high-performance artificial life / ecosystem simulation designed to run on the ESP32 and a 1.9" TFT display (ST7789). Watch a completely autonomous, pixel-perfect ecosystem unfold in the palm of your hand!
 
 ## ✨ Features
