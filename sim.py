@@ -271,11 +271,12 @@ def sim_step():
                 c.vx = c.vx * 0.96 + (dx/mag)*0.08
                 c.vy = c.vy * 0.96 + (dy/mag)*0.08
             if min_d < 36:
-                if nearest_h in herbs: herbs.remove(nearest_h)
-                c.energy += CARN_EAT_GAIN
-                spawn_garbage(nearest_h.x, nearest_h.y)
-                if nearest_h.infected and len(spores) < MAX_SPORES:
-                    spores.append(Spore(c.x, c.y))
+                nearest_h.energy -= 2.5
+                c.energy += 2.5
+                c.vx *= 0.5
+                c.vy *= 0.5
+                nearest_h.vx *= 0.2
+                nearest_h.vy *= 0.2
         else:
             c.vx += random.uniform(-0.1, 0.1)
             c.vy += random.uniform(-0.1, 0.1)
@@ -335,9 +336,12 @@ def sim_step():
                 a.vx = a.vx * 0.98 + (dx/mag)*0.12
                 a.vy = a.vy * 0.98 + (dy/mag)*0.12
             if min_d < 64:
-                if nearest_c in carns: carns.remove(nearest_c)
-                a.energy += APEX_EAT_GAIN
-                spawn_garbage(nearest_c.x, nearest_c.y)
+                nearest_c.energy -= 5.0
+                a.energy += 5.0
+                a.vx *= 0.6
+                a.vy *= 0.6
+                nearest_c.vx *= 0.1
+                nearest_c.vy *= 0.1
         else:
             a.vx += random.uniform(-0.1, 0.1)
             a.vy += random.uniform(-0.1, 0.1)
