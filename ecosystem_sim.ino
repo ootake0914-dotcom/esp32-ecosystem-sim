@@ -628,7 +628,7 @@ void loop() {
   long t = millis();
   
   // 昼夜サイクル（ダイナミックライティング）
-  float timeCycle = (sin(t * (1.0f / 5000.0f)) + 1.0f) * (1.0f / 2.0f); / * (1.0f / 0.0f)(夜) ~ 1.0f(昼)
+  float timeCycle = (sin(t * (1.0f / 5000.0f)) + 1.0f) * (1.0f / 2.0f); // 0.0f(夜) ~ 1.0f(昼)
   uint8_t bgR = 2 + timeCycle * 5;   
   uint8_t bgG = 5 + timeCycle * 15;  
   uint8_t bgB = 15 + timeCycle * 25; 
