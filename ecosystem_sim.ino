@@ -93,11 +93,11 @@ void spawnExplosion(float x, float y, uint8_t r, uint8_t g, uint8_t b, int count
     if(!particles[p].active) {
       particles[p].active = true;
       particles[p].x = x; particles[p].y = y;
-      float angle = random(0, 360) * PI / 180.0;
-      float speed = random(5, 25) / 10.0 * speedBase;
+      float angle = random(0, 360) * PI / 180.0f;
+      float speed = random(5, 25) / 10.0f * speedBase;
       particles[p].vx = cos(angle) * speed;
       particles[p].vy = sin(angle) * speed;
-      particles[p].life = 1.0;
+      particles[p].life = 1.0f;
       particles[p].r = r; particles[p].g = g; particles[p].b = b;
       count--;
     }
@@ -122,16 +122,16 @@ void spawnPlant() {
   }
 }
 
-void spawnHerb(float x, float y, float pSpeed = 0.8) {
+void spawnHerb(float x, float y, float pSpeed = 0.8f) {
   for(int i=0; i<MAX_HERBS; i++) {
     if(!herbs[i].active) {
       herbs[i].active = true;
       herbs[i].x = (x == -1) ? random(10, TFT_WIDTH-10) : x + random(-5, 5);
       herbs[i].y = (y == -1) ? random(10, TFT_HEIGHT-10) : y + random(-5, 5);
-      herbs[i].vx = (random(0, 100) / 50.0) - 1.0; herbs[i].vy = (random(0, 100) / 50.0) - 1.0;
+      herbs[i].vx = (random(0, 100) / 50.0f) - 1.0f; herbs[i].vy = (random(0, 100) / 50.0f) - 1.0f;
       herbs[i].energy = 80;
-      float newSpeed = pSpeed + (random(0, 200)/1000.0) - 0.1;
-      if(newSpeed < 0.3) newSpeed = 0.3; if(newSpeed > 2.0) newSpeed = 2.0;
+      float newSpeed = pSpeed + (random(0, 200)/1000.0f) - 0.1f;
+      if(newSpeed < 0.3f) newSpeed = 0.3f; if(newSpeed > 2.0f) newSpeed = 2.0f;
       herbs[i].speedLimit = newSpeed;
       initHistory(herbs[i], herbs[i].x, herbs[i].y);
       break;
@@ -139,16 +139,16 @@ void spawnHerb(float x, float y, float pSpeed = 0.8) {
   }
 }
 
-void spawnCarn(float x, float y, float pSpeed = 1.1) {
+void spawnCarn(float x, float y, float pSpeed = 1.1f) {
   for(int i=0; i<MAX_CARNS; i++) {
     if(!carns[i].active) {
       carns[i].active = true;
       carns[i].x = (x == -1) ? random(10, TFT_WIDTH-10) : x + random(-5, 5);
       carns[i].y = (y == -1) ? random(10, TFT_HEIGHT-10) : y + random(-5, 5);
-      carns[i].vx = (random(0, 100) / 50.0) - 1.0; carns[i].vy = (random(0, 100) / 50.0) - 1.0;
+      carns[i].vx = (random(0, 100) / 50.0f) - 1.0f; carns[i].vy = (random(0, 100) / 50.0f) - 1.0f;
       carns[i].energy = 100;
-      float newSpeed = pSpeed + (random(0, 200)/1000.0) - 0.1;
-      if(newSpeed < 0.5) newSpeed = 0.5; if(newSpeed > 2.5) newSpeed = 2.5;
+      float newSpeed = pSpeed + (random(0, 200)/1000.0f) - 0.1f;
+      if(newSpeed < 0.5f) newSpeed = 0.5f; if(newSpeed > 2.5f) newSpeed = 2.5f;
       carns[i].speedLimit = newSpeed;
       initHistory(carns[i], carns[i].x, carns[i].y);
       break;
@@ -156,16 +156,16 @@ void spawnCarn(float x, float y, float pSpeed = 1.1) {
   }
 }
 
-void spawnApex(float x, float y, float pSpeed = 1.5) {
+void spawnApex(float x, float y, float pSpeed = 1.5f) {
   for(int i=0; i<MAX_APEX; i++) {
     if(!apex[i].active) {
       apex[i].active = true;
       apex[i].x = (x == -1) ? random(10, TFT_WIDTH-10) : x + random(-5, 5);
       apex[i].y = (y == -1) ? random(10, TFT_HEIGHT-10) : y + random(-5, 5);
-      apex[i].vx = (random(0, 100) / 50.0) - 1.0; apex[i].vy = (random(0, 100) / 50.0) - 1.0;
+      apex[i].vx = (random(0, 100) / 50.0f) - 1.0f; apex[i].vy = (random(0, 100) / 50.0f) - 1.0f;
       apex[i].energy = 300;
-      float newSpeed = pSpeed + (random(0, 200)/1000.0) - 0.1;
-      if(newSpeed < 0.8) newSpeed = 0.8; if(newSpeed > 3.0) newSpeed = 3.0;
+      float newSpeed = pSpeed + (random(0, 200)/1000.0f) - 0.1f;
+      if(newSpeed < 0.8f) newSpeed = 0.8f; if(newSpeed > 3.0f) newSpeed = 3.0f;
       apex[i].speedLimit = newSpeed;
       initHistory(apex[i], apex[i].x, apex[i].y);
       break;
@@ -178,8 +178,8 @@ void spawnSpore(float x, float y) {
     if(!spores[i].active) {
       spores[i].active = true;
       spores[i].x = x; spores[i].y = y;
-      spores[i].vx = (random(0, 100)/100.0) - 0.5 + 0.4; 
-      spores[i].vy = (random(0, 100)/100.0) - 0.5;
+      spores[i].vx = (random(0, 100)/100.0f) - 0.5f + 0.4f; 
+      spores[i].vy = (random(0, 100)/100.0f) - 0.5f;
       break;
     }
   }
@@ -191,9 +191,9 @@ void spawnDecomp(float x, float y) {
       decomps[i].active = true;
       decomps[i].x = (x == -1) ? random(10, TFT_WIDTH-10) : x + random(-5, 5);
       decomps[i].y = (y == -1) ? random(10, TFT_HEIGHT-10) : y + random(-5, 5);
-      decomps[i].vx = (random(0, 100) / 50.0) - 1.0; decomps[i].vy = (random(0, 100) / 50.0) - 1.0;
+      decomps[i].vx = (random(0, 100) / 50.0f) - 1.0f; decomps[i].vy = (random(0, 100) / 50.0f) - 1.0f;
       decomps[i].energy = 80;
-      decomps[i].speedLimit = 0.7;
+      decomps[i].speedLimit = 0.7f;
       initHistory(decomps[i], decomps[i].x, decomps[i].y);
       break;
     }
@@ -241,9 +241,9 @@ void core0Task(void * pvParameters) {
       if(particles[p].active) {
         particles[p].x += particles[p].vx;
         particles[p].y += particles[p].vy;
-        particles[p].vx *= 0.9; // 減速（摩擦）
-        particles[p].vy *= 0.9;
-        particles[p].life -= 0.05; // 寿命
+        particles[p].vx *= 0.9f; // 減速（摩擦）
+        particles[p].vy *= 0.9f;
+        particles[p].life -= 0.05f; // 寿命
         if(particles[p].life <= 0) particles[p].active = false;
       }
     }
@@ -277,19 +277,19 @@ void core0Task(void * pvParameters) {
       if(targetG != -1) {
         float dx = garbages[targetG].x - decomps[i].x; float dy = garbages[targetG].y - decomps[i].y;
         float distSq = dx*dx + dy*dy;
-        if(distSq > 0) { float invMag = Q_rsqrt(distSq); decomps[i].vx = (decomps[i].vx * 0.95) + (dx*invMag * 0.1); decomps[i].vy = (decomps[i].vy * 0.95) + (dy*invMag * 0.1); }
-        if(minDist < 36) { garbages[targetG].active = false; decomps[i].energy += 20; decomps[i].flash = 1.0; }
+        if(distSq > 0) { float invMag = Q_rsqrt(distSq); decomps[i].vx = (decomps[i].vx * 0.95f) + (dx*invMag * 0.1f); decomps[i].vy = (decomps[i].vy * 0.95f) + (dy*invMag * 0.1f); }
+        if(minDist < 36) { garbages[targetG].active = false; decomps[i].energy += 20; decomps[i].flash = 1.0f; }
       } else if(targetS != -1) {
         float dx = spores[targetS].x - decomps[i].x; float dy = spores[targetS].y - decomps[i].y;
         float distSq = dx*dx + dy*dy;
-        if(distSq > 0) { float invMag = Q_rsqrt(distSq); decomps[i].vx = (decomps[i].vx * 0.95) + (dx*invMag * 0.1); decomps[i].vy = (decomps[i].vy * 0.95) + (dy*invMag * 0.1); }
-        if(minDist < 36) { spores[targetS].active = false; decomps[i].energy += 20; decomps[i].flash = 1.0; }
+        if(distSq > 0) { float invMag = Q_rsqrt(distSq); decomps[i].vx = (decomps[i].vx * 0.95f) + (dx*invMag * 0.1f); decomps[i].vy = (decomps[i].vy * 0.95f) + (dy*invMag * 0.1f); }
+        if(minDist < 36) { spores[targetS].active = false; decomps[i].energy += 20; decomps[i].flash = 1.0f; }
       } else {
-        decomps[i].vx += (random(0, 100)/500.0) - 0.1; decomps[i].vy += (random(0, 100)/500.0) - 0.1;
+        decomps[i].vx += (random(0, 100)/500.0f) - 0.1f; decomps[i].vy += (random(0, 100)/500.0f) - 0.1f;
       }
       
       float speedSq = decomps[i].vx*decomps[i].vx + decomps[i].vy*decomps[i].vy;
-      if(speedSq > 0.49) { float invSpeed = Q_rsqrt(speedSq); decomps[i].vx = decomps[i].vx*invSpeed*0.7; decomps[i].vy = decomps[i].vy*invSpeed*0.7; }
+      if(speedSq > 0.49f) { float invSpeed = Q_rsqrt(speedSq); decomps[i].vx = decomps[i].vx*invSpeed*0.7f; decomps[i].vy = decomps[i].vy*invSpeed*0.7f; }
       decomps[i].x += decomps[i].vx; decomps[i].y += decomps[i].vy;
       
       if(decomps[i].x < 0) { decomps[i].x = 0; decomps[i].vx *= -1; }
@@ -297,10 +297,10 @@ void core0Task(void * pvParameters) {
       if(decomps[i].y < 0) { decomps[i].y = 0; decomps[i].vy *= -1; }
       if(decomps[i].y > TFT_HEIGHT) { decomps[i].y = TFT_HEIGHT; decomps[i].vy *= -1; }
       
-      decomps[i].energy -= 0.05;
+      decomps[i].energy -= 0.05f;
       if(decomps[i].energy <= 0) {
         decomps[i].active = false;
-        spawnExplosion(decomps[i].x, decomps[i].y, 100, 255, 100, 5, 0.5);
+        spawnExplosion(decomps[i].x, decomps[i].y, 100, 255, 100, 5, 0.5f);
         spawnGarbage(decomps[i].x, decomps[i].y, 100, 255, 100);
       } else if(decomps[i].energy > 120) {
         decomps[i].energy -= 80;
@@ -308,7 +308,7 @@ void core0Task(void * pvParameters) {
         for(int p=0; p<MAX_PLANTS; p++) {
           if(!plants[p].active) {
             plants[p].active = true; plants[p].x = decomps[i].x; plants[p].y = decomps[i].y;
-            spawnExplosion(decomps[i].x, decomps[i].y, 100, 255, 50, 10, 1.0); // 誕生エフェクト
+            spawnExplosion(decomps[i].x, decomps[i].y, 100, 255, 50, 10, 1.0f); // 誕生エフェクト
             break;
           }
         }
@@ -326,9 +326,9 @@ void core0Task(void * pvParameters) {
         if(herbs[h].active && !herbs[h].infected) {
           float dx = herbs[h].x - spores[i].x; float dy = herbs[h].y - spores[i].y;
           if(dx*dx + dy*dy < 36) { 
-            herbs[h].infected = true; herbs[h].flash = 1.0;
+            herbs[h].infected = true; herbs[h].flash = 1.0f;
             spores[i].active = false;
-            spawnExplosion(herbs[h].x, herbs[h].y, 180, 0, 255, 8, 1.0); // 感染エフェクト
+            spawnExplosion(herbs[h].x, herbs[h].y, 180, 0, 255, 8, 1.0f); // 感染エフェクト
             break;
           }
         }
@@ -353,7 +353,7 @@ void core0Task(void * pvParameters) {
             cohX += herbs[j].x; cohY += herbs[j].y;
             flockCount++;
             if (distSq < 100 && distSq > 0) {
-              herbs[i].vx -= (dX/distSq) * 2.0; herbs[i].vy -= (dY/distSq) * 2.0;
+              herbs[i].vx -= (dX/distSq) * 2.0f; herbs[i].vy -= (dY/distSq) * 2.0f;
             }
           }
         }
@@ -361,11 +361,11 @@ void core0Task(void * pvParameters) {
       if (flockCount > 0 && !herbs[i].infected) { 
         alignX /= flockCount; alignY /= flockCount;
         float aMag = sqrt(alignX*alignX + alignY*alignY);
-        if (aMag > 0) { herbs[i].vx += (alignX/aMag) * 0.04; herbs[i].vy += (alignY/aMag) * 0.04; }
+        if (aMag > 0) { herbs[i].vx += (alignX/aMag) * 0.04f; herbs[i].vy += (alignY/aMag) * 0.04f; }
         cohX /= flockCount; cohY /= flockCount;
         float cX = cohX - herbs[i].x; float cY = cohY - herbs[i].y;
         float cMag = sqrt(cX*cX + cY*cY);
-        if (cMag > 0) { herbs[i].vx += (cX/cMag) * 0.015; herbs[i].vy += (cY/cMag) * 0.015; }
+        if (cMag > 0) { herbs[i].vx += (cX/cMag) * 0.015f; herbs[i].vy += (cY/cMag) * 0.015f; }
       }
 
       float minDist = 99999;
@@ -382,15 +382,15 @@ void core0Task(void * pvParameters) {
         float dx = plants[target].x - herbs[i].x; float dy = plants[target].y - herbs[i].y;
         float mag = sqrt(dx*dx + dy*dy);
         if(mag > 0 && !herbs[i].infected) {
-          herbs[i].vx = (herbs[i].vx * 0.97) + ((dx/mag) * 0.05); herbs[i].vy = (herbs[i].vy * 0.97) + ((dy/mag) * 0.05);
+          herbs[i].vx = (herbs[i].vx * 0.97f) + ((dx/mag) * 0.05f); herbs[i].vy = (herbs[i].vy * 0.97f) + ((dy/mag) * 0.05f);
         }
         if(minDist < 25) { 
           plants[target].active = false;
-          herbs[i].energy += 30; herbs[i].flash = 1.0; 
-          spawnExplosion(plants[target].x, plants[target].y, 150, 255, 150, 5, 0.5); // 草食エフェクト
+          herbs[i].energy += 30; herbs[i].flash = 1.0f; 
+          spawnExplosion(plants[target].x, plants[target].y, 150, 255, 150, 5, 0.5f); // 草食エフェクト
         }
       } else {
-        herbs[i].vx += (random(0, 100)/500.0) - 0.1; herbs[i].vy += (random(0, 100)/500.0) - 0.1;
+        herbs[i].vx += (random(0, 100)/500.0f) - 0.1f; herbs[i].vy += (random(0, 100)/500.0f) - 0.1f;
       }
       
       for(int c=0; c<MAX_CARNS; c++) {
@@ -399,7 +399,7 @@ void core0Task(void * pvParameters) {
           float dist = dx*dx + dy*dy;
           if(dist < 4000) { 
              float mag = sqrt(dist);
-             if(mag > 0) { herbs[i].vx += (dx/mag) * 0.1; herbs[i].vy += (dy/mag) * 0.1; }
+             if(mag > 0) { herbs[i].vx += (dx/mag) * 0.1f; herbs[i].vy += (dy/mag) * 0.1f; }
           }
         }
       }
@@ -409,19 +409,19 @@ void core0Task(void * pvParameters) {
           float dist = dx*dx + dy*dy;
           if(dist < 6000) { 
              float mag = sqrt(dist);
-             if(mag > 0) { herbs[i].vx += (dx/mag) * 0.12; herbs[i].vy += (dy/mag) * 0.12; }
+             if(mag > 0) { herbs[i].vx += (dx/mag) * 0.12f; herbs[i].vy += (dy/mag) * 0.12f; }
           }
         }
       }
       
       if(herbs[i].infected) {
-        herbs[i].vx += (random(0, 100)/100.0) - 0.5; herbs[i].vy += (random(0, 100)/100.0) - 0.5;
-        herbs[i].energy -= 0.15; 
+        herbs[i].vx += (random(0, 100)/100.0f) - 0.5f; herbs[i].vy += (random(0, 100)/100.0f) - 0.5f;
+        herbs[i].energy -= 0.15f; 
         // 感染者はたまに紫パーティクルをこぼす
-        if(random(0,100)<10) spawnExplosion(herbs[i].x, herbs[i].y, 180, 0, 255, 1, 0.2); 
+        if(random(0,100)<10) spawnExplosion(herbs[i].x, herbs[i].y, 180, 0, 255, 1, 0.2f); 
       }
 
-      float speedLimit = herbs[i].infected ? herbs[i].speedLimit + 0.4 : herbs[i].speedLimit;
+      float speedLimit = herbs[i].infected ? herbs[i].speedLimit + 0.4f : herbs[i].speedLimit;
       float speed = sqrt(herbs[i].vx*herbs[i].vx + herbs[i].vy*herbs[i].vy);
       if(speed > speedLimit) { herbs[i].vx = (herbs[i].vx/speed)*speedLimit; herbs[i].vy = (herbs[i].vy/speed)*speedLimit; }
       
@@ -432,15 +432,15 @@ void core0Task(void * pvParameters) {
       if(herbs[i].y < 0) { herbs[i].y = 0; herbs[i].vy *= -1; }
       if(herbs[i].y > TFT_HEIGHT) { herbs[i].y = TFT_HEIGHT; herbs[i].vy *= -1; }
       
-      herbs[i].energy -= 0.04 * (herbs[i].speedLimit / 0.8); 
+      herbs[i].energy -= 0.04f * (herbs[i].speedLimit / 0.8f); 
       if(herbs[i].energy <= 0) {
         herbs[i].active = false;
         if(herbs[i].infected) {
           spawnSpore(herbs[i].x, herbs[i].y); spawnSpore(herbs[i].x, herbs[i].y);
-          spawnExplosion(herbs[i].x, herbs[i].y, 180, 0, 255, 15, 1.0); // 感染死爆発
+          spawnExplosion(herbs[i].x, herbs[i].y, 180, 0, 255, 15, 1.0f); // 感染死爆発
           spawnGarbage(herbs[i].x, herbs[i].y, 180, 0, 255);
         } else {
-          spawnExplosion(herbs[i].x, herbs[i].y, 0, 255, 255, 5, 0.5); // 通常死爆発
+          spawnExplosion(herbs[i].x, herbs[i].y, 0, 255, 255, 5, 0.5f); // 通常死爆発
           spawnGarbage(herbs[i].x, herbs[i].y, 0, 255, 255);
         }
       } else if (herbs[i].energy > 120 && !herbs[i].infected) {
@@ -468,22 +468,22 @@ void core0Task(void * pvParameters) {
         float dx = herbs[carns[i].targetId].x - carns[i].x; float dy = herbs[carns[i].targetId].y - carns[i].y;
         float mag = sqrt(dx*dx + dy*dy);
         if(mag > 0) {
-          carns[i].vx = (carns[i].vx * 0.96) + ((dx/mag) * 0.08); carns[i].vy = (carns[i].vy * 0.96) + ((dy/mag) * 0.08);
+          carns[i].vx = (carns[i].vx * 0.96f) + ((dx/mag) * 0.08f); carns[i].vy = (carns[i].vy * 0.96f) + ((dy/mag) * 0.08f);
         }
         
         if(minDist < 36) { 
           // 食いつき処理（時間をかけて捕食）
-          herbs[carns[i].targetId].energy -= 2.5; 
-          carns[i].energy += 2.5; 
-          carns[i].flash = 1.0; 
+          herbs[carns[i].targetId].energy -= 2.5f; 
+          carns[i].energy += 2.5f; 
+          carns[i].flash = 1.0f; 
           // 噛み付いている間は両者とも足が遅くなる
-          carns[i].vx *= 0.5; carns[i].vy *= 0.5;
-          herbs[carns[i].targetId].vx *= 0.2; herbs[carns[i].targetId].vy *= 0.2;
+          carns[i].vx *= 0.5f; carns[i].vy *= 0.5f;
+          herbs[carns[i].targetId].vx *= 0.2f; herbs[carns[i].targetId].vy *= 0.2f;
           // 血飛沫（たまに出る）
-          if(random(0,100) < 30) spawnExplosion(herbs[carns[i].targetId].x, herbs[carns[i].targetId].y, 0, 255, 255, 1, 0.4);
+          if(random(0,100) < 30) spawnExplosion(herbs[carns[i].targetId].x, herbs[carns[i].targetId].y, 0, 255, 255, 1, 0.4f);
         }
       } else {
-        carns[i].vx += (random(0, 100)/500.0) - 0.1; carns[i].vy += (random(0, 100)/500.0) - 0.1;
+        carns[i].vx += (random(0, 100)/500.0f) - 0.1f; carns[i].vy += (random(0, 100)/500.0f) - 0.1f;
       }
 
       bool escaping = false;
@@ -494,12 +494,12 @@ void core0Task(void * pvParameters) {
           if(dist < 8000) { 
              escaping = true;
              float mag = sqrt(dist);
-             if(mag > 0) { carns[i].vx += (dx/mag) * 0.3; carns[i].vy += (dy/mag) * 0.3; } // 強い力で逃げる
+             if(mag > 0) { carns[i].vx += (dx/mag) * 0.3f; carns[i].vy += (dy/mag) * 0.3f; } // 強い力で逃げる
           }
         }
       }
       
-      float limit = escaping ? carns[i].speedLimit + 0.6 : carns[i].speedLimit; // 逃走時はApex(1.5)より速く走る！
+      float limit = escaping ? carns[i].speedLimit + 0.6f : carns[i].speedLimit; // 逃走時はApex(1.5f)より速く走る！
       float speed = sqrt(carns[i].vx*carns[i].vx + carns[i].vy*carns[i].vy);
       if(speed > limit) { carns[i].vx = (carns[i].vx/speed)*limit; carns[i].vy = (carns[i].vy/speed)*limit; }
       carns[i].x += carns[i].vx; carns[i].y += carns[i].vy;
@@ -509,10 +509,10 @@ void core0Task(void * pvParameters) {
       if(carns[i].y < 0) { carns[i].y = 0; carns[i].vy *= -1; }
       if(carns[i].y > TFT_HEIGHT) { carns[i].y = TFT_HEIGHT; carns[i].vy *= -1; }
       
-      carns[i].energy -= 0.06 * (carns[i].speedLimit / 1.1);
+      carns[i].energy -= 0.06f * (carns[i].speedLimit / 1.1f);
       if(carns[i].energy <= 0) {
         carns[i].active = false;
-        spawnExplosion(carns[i].x, carns[i].y, 255, 50, 150, 8, 0.8);
+        spawnExplosion(carns[i].x, carns[i].y, 255, 50, 150, 8, 0.8f);
         spawnGarbage(carns[i].x, carns[i].y, 255, 50, 150);
       } else if (carns[i].energy > 150) {
         carns[i].energy -= 70;
@@ -540,21 +540,21 @@ void core0Task(void * pvParameters) {
         float dy = carns[apex[i].targetId].y - apex[i].y;
         float mag = sqrt(dx*dx + dy*dy);
         if(mag > 0) {
-          apex[i].vx = (apex[i].vx * 0.98) + ((dx/mag) * 0.12); 
-          apex[i].vy = (apex[i].vy * 0.98) + ((dy/mag) * 0.12);
+          apex[i].vx = (apex[i].vx * 0.98f) + ((dx/mag) * 0.12f); 
+          apex[i].vy = (apex[i].vy * 0.98f) + ((dy/mag) * 0.12f);
         }
         if(minDist < 64) { 
           // 頂点捕食者の食いつき処理
-          carns[apex[i].targetId].energy -= 5.0; 
-          apex[i].energy += 5.0;
-          apex[i].flash = 1.0;
+          carns[apex[i].targetId].energy -= 5.0f; 
+          apex[i].energy += 5.0f;
+          apex[i].flash = 1.0f;
           // 丸呑みではなく、少しもみ合いになる
-          apex[i].vx *= 0.6; apex[i].vy *= 0.6;
-          carns[apex[i].targetId].vx *= 0.1; carns[apex[i].targetId].vy *= 0.1;
-          if(random(0,100) < 40) spawnExplosion(carns[apex[i].targetId].x, carns[apex[i].targetId].y, 255, 50, 150, 2, 0.6); 
+          apex[i].vx *= 0.6f; apex[i].vy *= 0.6f;
+          carns[apex[i].targetId].vx *= 0.1f; carns[apex[i].targetId].vy *= 0.1f;
+          if(random(0,100) < 40) spawnExplosion(carns[apex[i].targetId].x, carns[apex[i].targetId].y, 255, 50, 150, 2, 0.6f); 
         }
       } else {
-        apex[i].vx += (random(0, 100)/500.0) - 0.1; apex[i].vy += (random(0, 100)/500.0) - 0.1;
+        apex[i].vx += (random(0, 100)/500.0f) - 0.1f; apex[i].vy += (random(0, 100)/500.0f) - 0.1f;
       }
       
       float speed = sqrt(apex[i].vx*apex[i].vx + apex[i].vy*apex[i].vy);
@@ -566,10 +566,10 @@ void core0Task(void * pvParameters) {
       if(apex[i].y < 0) { apex[i].y = 0; apex[i].vy *= -1; }
       if(apex[i].y > TFT_HEIGHT) { apex[i].y = TFT_HEIGHT; apex[i].vy *= -1; }
       
-      apex[i].energy -= 0.15 * (apex[i].speedLimit / 1.5); 
+      apex[i].energy -= 0.15f * (apex[i].speedLimit / 1.5f); 
       if(apex[i].energy <= 0) {
         apex[i].active = false;
-        spawnExplosion(apex[i].x, apex[i].y, 255, 215, 0, 15, 1.0);
+        spawnExplosion(apex[i].x, apex[i].y, 255, 215, 0, 15, 1.0f);
         spawnGarbage(apex[i].x, apex[i].y, 255, 215, 0);
       }
       else if (apex[i].energy > 500) { apex[i].energy -= 200; spawnApex(apex[i].x, apex[i].y, apex[i].speedLimit); }
@@ -608,7 +608,7 @@ void setup() {
     planktons[i].x = random(0, TFT_WIDTH);
     planktons[i].y = random(0, TFT_HEIGHT);
     planktons[i].layer = random(1, 4); // 1:奥(遅い), 2:中, 3:手前(速い)
-    planktons[i].vx = (planktons[i].layer * random(5, 15)) / 40.0; 
+    planktons[i].vx = (planktons[i].layer * random(5, 15)) / 40.0f; 
   }
 
   xTaskCreatePinnedToCore(core0Task, "ApexTask", 10000, NULL, 1, &Task1, 0); 
@@ -628,7 +628,7 @@ void loop() {
   long t = millis();
   
   // 昼夜サイクル（ダイナミックライティング）
-  float timeCycle = (sin(t / 5000.0) + 1.0) / 2.0; // 0.0(夜) ~ 1.0(昼)
+  float timeCycle = (sin(t / 5000.0f) + 1.0f) / 2.0f; // 0.0f(夜) ~ 1.0f(昼)
   uint8_t bgR = 2 + timeCycle * 5;   
   uint8_t bgG = 5 + timeCycle * 15;  
   uint8_t bgB = 15 + timeCycle * 25; 
@@ -650,12 +650,12 @@ void loop() {
   // 植物 (幾何学的に回転する花)
   for(int i=0; i<MAX_PLANTS; i++) {
     if(plants[i].active) {
-      float pulse = (sin(t / 150.0 + i) + 1.0) / 2.0; 
-      float rot = t / 1000.0 + i;
-      int r = 3 + (pulse * 2.0);
+      float pulse = (sin(t / 150.0f + i) + 1.0f) / 2.0f; 
+      float rot = t / 1000.0f + i;
+      int r = 3 + (pulse * 2.0f);
       
       // 光のオーラ (アンチエイリアス)
-      img.fillSmoothCircle(plants[i].x, plants[i].y, r + 1.5, fadeColor(20, 150, 20, 0.4));
+      img.fillSmoothCircle(plants[i].x, plants[i].y, r + 1.5f, fadeColor(20, 150, 20, 0.4f));
       
       // クロス状の葉 (アンチエイリアス線)
       float px1 = plants[i].x + cos(rot) * r; float py1 = plants[i].y + sin(rot) * r;
@@ -663,9 +663,9 @@ void loop() {
       float px3 = plants[i].x + cos(rot + PI/2) * r; float py3 = plants[i].y + sin(rot + PI/2) * r;
       float px4 = plants[i].x + cos(rot - PI/2) * r; float py4 = plants[i].y + sin(rot - PI/2) * r;
       
-      img.drawWedgeLine(px1, py1, px2, py2, 0.5, 0.5, myColor(150, 255, 150));
-      img.drawWedgeLine(px3, py3, px4, py4, 0.5, 0.5, myColor(150, 255, 150));
-      img.fillSmoothCircle(plants[i].x, plants[i].y, 1.5, TFT_WHITE);
+      img.drawWedgeLine(px1, py1, px2, py2, 0.5f, 0.5f, myColor(150, 255, 150));
+      img.drawWedgeLine(px3, py3, px4, py4, 0.5f, 0.5f, myColor(150, 255, 150));
+      img.fillSmoothCircle(plants[i].x, plants[i].y, 1.5f, TFT_WHITE);
     }
   }
   
@@ -675,7 +675,7 @@ void loop() {
       if(herbs[carns[i].targetId].active) {
         float dx = carns[i].x - herbs[carns[i].targetId].x; float dy = carns[i].y - herbs[carns[i].targetId].y;
         if(dx*dx + dy*dy < 1600) { // 近い時だけ赤いレーザー (AA)
-          img.drawWedgeLine(carns[i].x, carns[i].y, herbs[carns[i].targetId].x, herbs[carns[i].targetId].y, 0.5, 0.5, myColor(150, 0, 70));
+          img.drawWedgeLine(carns[i].x, carns[i].y, herbs[carns[i].targetId].x, herbs[carns[i].targetId].y, 0.5f, 0.5f, myColor(150, 0, 70));
         }
       }
     }
@@ -685,7 +685,7 @@ void loop() {
       if(carns[apex[i].targetId].active) {
         float dx = apex[i].x - carns[apex[i].targetId].x; float dy = apex[i].y - carns[apex[i].targetId].y;
         if(dx*dx + dy*dy < 4000) { // 黄金のレーザー (AA)
-          img.drawWedgeLine(apex[i].x, apex[i].y, carns[apex[i].targetId].x, carns[apex[i].targetId].y, 0.5, 0.5, myColor(200, 150, 0));
+          img.drawWedgeLine(apex[i].x, apex[i].y, carns[apex[i].targetId].x, carns[apex[i].targetId].y, 0.5f, 0.5f, myColor(200, 150, 0));
         }
       }
     }
@@ -694,9 +694,9 @@ void loop() {
   // 胞子
   for(int i=0; i<MAX_SPORES; i++) {
     if(spores[i].active) {
-      float pulse = (sin(t / 100.0 + i) + 1.0) / 2.0; 
-      int r = 1 + (pulse * 1.5);
-      img.fillSmoothCircle(spores[i].x, spores[i].y, r+1.5, fadeColor(180, 0, 255, 0.4));
+      float pulse = (sin(t / 100.0f + i) + 1.0f) / 2.0f; 
+      int r = 1 + (pulse * 1.5f);
+      img.fillSmoothCircle(spores[i].x, spores[i].y, r+1.5f, fadeColor(180, 0, 255, 0.4f));
       img.fillSmoothCircle(spores[i].x, spores[i].y, r, myColor(255, 100, 255));
     }
   }
@@ -721,13 +721,13 @@ void loop() {
       // ワープした線を描画しない
       if(distSq > 1000) continue;
       // ほとんど動いていない場合は、同じ場所に何度も線を引かない（オーバードロー防止で負荷激減）
-      if(distSq < 0.1 && h > 0) continue; 
+      if(distSq < 0.1f && h > 0) continue; 
       
-      float factor1 = 1.0 - ((float)h / HISTORY_LEN);
-      float factor2 = 1.0 - ((float)next_h / HISTORY_LEN);
+      float factor1 = 1.0f - ((float)h / HISTORY_LEN);
+      float factor2 = 1.0f - ((float)next_h / HISTORY_LEN);
       
       // 完全に透明（黒）に近いなら描画を省略
-      if (factor1 < 0.05 && factor2 < 0.05) continue;
+      if (factor1 < 0.05f && factor2 < 0.05f) continue;
 
       // 頭から尻尾にかけて滑らかに消えていく
       uint16_t color = infected ? fadeColor(180, 0, 255, factor1) : fadeColor(r, g, b, factor1);
@@ -736,22 +736,22 @@ void loop() {
       float rad1 = wid * factor1;
       float rad2 = wid * factor2;
       
-      if (rad1 > 0.2 || rad2 > 0.2) {
+      if (rad1 > 0.2f || rad2 > 0.2f) {
         img.drawWedgeLine(hx1, hy1, hx2, hy2, rad1, rad2, color);
       }
     }
     
     // 頭部（とんがった形をやめて、丸く可愛らしい形に変更）
     uint16_t headColor = e.flash > 0 ? TFT_WHITE : (infected ? myColor(180, 0, 255) : myColor(r, g, b));
-    if (e.flash > 0) e.flash -= 0.1;
+    if (e.flash > 0) e.flash -= 0.1f;
     
     img.fillSmoothCircle(e.x, e.y, wid, headColor);
   };
 
-  for(int i=0; i<MAX_DECOMPS; i++) drawEntity(decomps[i], 150, 255, 50, 4.0, 2.5, false); // 分解者はライムグリーン
-  for(int i=0; i<MAX_HERBS; i++) drawEntity(herbs[i], 0, 255, 255, 6.0, 3.5, herbs[i].infected);
-  for(int i=0; i<MAX_CARNS; i++) drawEntity(carns[i], 255, 50, 150, 8.0, 4.5, false);
-  for(int i=0; i<MAX_APEX; i++) drawEntity(apex[i], 255, 215, 0, 10.0, 5.5, false);
+  for(int i=0; i<MAX_DECOMPS; i++) drawEntity(decomps[i], 150, 255, 50, 4.0f, 2.5f, false); // 分解者はライムグリーン
+  for(int i=0; i<MAX_HERBS; i++) drawEntity(herbs[i], 0, 255, 255, 6.0f, 3.5f, herbs[i].infected);
+  for(int i=0; i<MAX_CARNS; i++) drawEntity(carns[i], 255, 50, 150, 8.0f, 4.5f, false);
+  for(int i=0; i<MAX_APEX; i++) drawEntity(apex[i], 255, 215, 0, 10.0f, 5.5f, false);
 
   // パーティクル爆発の描画
   for(int p=0; p<MAX_PARTICLES; p++) {
@@ -764,7 +764,7 @@ void loop() {
   // ゴミ（死骸）の描画
   for(int g=0; g<MAX_GARBAGES; g++) {
     if(garbages[g].active) {
-      uint16_t gc = fadeColor(garbages[g].r, garbages[g].g, garbages[g].b, 0.7); // 少し暗め
+      uint16_t gc = fadeColor(garbages[g].r, garbages[g].g, garbages[g].b, 0.7f); // 少し暗め
       img.drawLine(garbages[g].x-2, garbages[g].y-2, garbages[g].x+2, garbages[g].y+2, gc);
       img.drawLine(garbages[g].x+2, garbages[g].y-2, garbages[g].x-2, garbages[g].y+2, gc);
     }
