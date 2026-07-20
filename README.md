@@ -1,6 +1,6 @@
 # ESP32 Micro Ecosystem Simulator
 
-This is a fork of [https://github.com/ootake0914-dotcom/esp32-ecosystem-sim](https://github.com/ootake0914-dotcom/esp32-ecosystem-sim) for the ESP32-S3 ES3N28P board, which has a 320x240 display (and a whole bunch of other stuff), and yet only costs around €14. I like to call it the "cheap obsidian display" as a nod toward the "cheap yellow display"
+This is a fork of [https://github.com/ootake0914-dotcom/esp32-ecosystem-sim](https://github.com/ootake0914-dotcom/esp32-ecosystem-sim) for the ESP32-S3 ES3N28P board, which has a 320x240 display (and a whole bunch of other stuff), and yet only costs around €14 (see e.g. [Aliexpress](https://www.aliexpress.com/item/1005010254147612.html)). I like to call it the "cheap obsidian display" as a nod toward the "cheap yellow display"
 
 ### Real Hardware (ESP32 + TFT)
 ![Real ESP32 Hardware](esp32_hardware_demo.gif)
