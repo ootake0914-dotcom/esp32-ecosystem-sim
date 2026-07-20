@@ -1,5 +1,7 @@
 # ESP32 Micro Ecosystem Simulator
 
+This is a fork of [https://github.com/ootake0914-dotcom/esp32-ecosystem-sim](https://github.com/ootake0914-dotcom/esp32-ecosystem-sim) for the ESP32-S3 ES3N28P board, which has a 320x240 display (and a whole bunch of other stuff), and yet only costs around €14. I like to call it the "cheap obsidian display" as a nod toward the "cheap yellow display"
+
 ### Real Hardware (ESP32 + TFT)
 ![Real ESP32 Hardware](esp32_hardware_demo.gif)
 
@@ -18,7 +20,7 @@ A highly optimized artificial life / ecosystem simulation for ESP32-class boards
 
 ## Hardware (default target)
 
-**LCDwiki ES3N28P** (“cheap Obsidian” board):
+**LCDwiki ES3N28P** (“cheap obsidian display"):
 
 | Item | Value |
 |------|-------|
@@ -38,14 +40,19 @@ SPI pins (on-board, no wiring needed):
 | RST | chip reset (-1) |
 | Backlight | 45 |
 
-Same pinout as the sibling [cheap-obsidian-display](../cheap-obsidian-display) bring-up project.
-
 Firmware source lives in [`src/main.cpp`](src/main.cpp) (PlatformIO layout).
 
 ## How to build & flash (PlatformIO)
 
+Install platformio if needed:
 ```bash
-cd esp32-ecosystem-sim
+sudo apt-get install pipx
+pipx install platformio
+```
+
+Build the firmware and upload it:
+
+```bash
 ./build.sh              # compile
 ./build.sh upload       # compile + flash (set UPLOAD_PORT if needed)
 ./build.sh monitor      # serial monitor
@@ -63,7 +70,7 @@ If auto-flash fails on the Obsidian board: hold **BOOT**, tap **RESET**, release
 
 ### Color tweak
 
-If red/blue look swapped, set `SWAP_RB = true` near the top of `src/main.cpp`.
+Red/blue were swapped compared to the original code, so I set `SWAP_RB = false` near the top of `src/main.cpp`.
 
 ## Python Simulator
 
