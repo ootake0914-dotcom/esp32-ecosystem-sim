@@ -1,2 +1,4 @@
 build/
+.pio/
+.pio-venv/
 .DS_Store
