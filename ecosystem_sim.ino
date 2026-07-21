@@ -16,8 +16,8 @@ uint16_t myColor(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 uint16_t fadeColor(uint8_t r, uint8_t g, uint8_t b, float factor) {
-  if (SWAP_RB) return tft.color565((uint8_t)(b * factor), (uint8_t)(g * factor), (uint8_t)(r * factor));
-  return tft.color565((uint8_t)(r * factor), (uint8_t)(g * factor), (uint8_t)(b * factor));
+  if (SWAP_RB) return tft.color565((uint8_t)(b * factor + 0.5f), (uint8_t)(g * factor + 0.5f), (uint8_t)(r * factor + 0.5f));
+  return tft.color565((uint8_t)(r * factor + 0.5f), (uint8_t)(g * factor + 0.5f), (uint8_t)(b * factor + 0.5f));
 }
 
 const int MAX_PLANTS = 50; 
@@ -43,6 +43,7 @@ struct Entity {
   bool infected;
   int targetId;
   float speedLimit;
+  int age;
 };
 
 struct Spore { bool active; float x, y, vx, vy; };
@@ -79,8 +80,8 @@ void spawnExplosion(float x, float y, uint8_t r, uint8_t g, uint8_t b, int count
 void spawnGarbage(float x, float y, uint8_t r, uint8_t g, uint8_t b);
 
 void initHistory(Entity &e, float x, float y) {
-  for(int i=0; i<HISTORY_LEN; i++) { e.histX[i] = x; e.histY[i] = y; }
-  e.histIdx = 0; e.flash = 0; e.infected = false; e.targetId = -1;
+  for(int i=0; i<HISTORY_LEN; i++) { e.histX[i] = -100.0f; e.histY[i] = -100.0f; } // 番兵として-100を使用
+  e.histIdx = 0; e.flash = 0; e.infected = false; e.targetId = -1; e.age = 0;
 }
 
 void updateHistory(Entity &e) {
@@ -105,7 +106,7 @@ void spawnExplosion(float x, float y, uint8_t r, uint8_t g, uint8_t b, int count
 }
 
 void spawnGarbage(float x, float y, uint8_t r, uint8_t g, uint8_t b) {
-  garbages[garbageIdx].active = true;
+  garbages[garbageIdx].active = true; // 意図的なリングバッファ上書き（古いゴミから消える）
   garbages[garbageIdx].x = x + random(-3, 4);
   garbages[garbageIdx].y = y + random(-3, 4);
   garbages[garbageIdx].r = r; garbages[garbageIdx].g = g; garbages[garbageIdx].b = b;
@@ -208,10 +209,11 @@ float Q_rsqrt( float number ) {
   const float threehalfs = 1.5F;
   x2 = number * 0.5F;
   y  = number;
-  i  = * ( long * ) &y;
+  memcpy(&i, &y, sizeof(i)); // strict-aliasing違反回避
   i  = 0x5f3759df - ( i >> 1 );
-  y  = * ( float * ) &i;
+  memcpy(&y, &i, sizeof(y)); // strict-aliasing違反回避
   y  = y * ( threehalfs - ( x2 * y * y ) );
+  // ESP32では 1.0f / sqrtf(number) の方が高速な可能性があるため将来的に要比較
   return y;
 }
 
@@ -252,6 +254,7 @@ void core0Task(void * pvParameters) {
     for(int i=0; i<MAX_DECOMPS; i++) {
       if(!decomps[i].active) continue;
       updateHistory(decomps[i]);
+      decomps[i].age++;
       
       float minDist = 99999;
       int targetG = -1;
@@ -339,6 +342,7 @@ void core0Task(void * pvParameters) {
     for(int i=0; i<MAX_HERBS; i++) {
       if(!herbs[i].active) continue;
       updateHistory(herbs[i]);
+      herbs[i].age++;
       
       float alignX = 0, alignY = 0, cohX = 0, cohY = 0;
       int flockCount = 0;
@@ -453,6 +457,7 @@ void core0Task(void * pvParameters) {
     for(int i=0; i<MAX_CARNS; i++) {
       if(!carns[i].active) continue;
       updateHistory(carns[i]);
+      carns[i].age++;
       
       float minDist = 99999;
       carns[i].targetId = -1;
@@ -524,6 +529,7 @@ void core0Task(void * pvParameters) {
     for(int i=0; i<MAX_APEX; i++) {
       if(!apex[i].active) continue;
       updateHistory(apex[i]);
+      apex[i].age++;
       
       float minDist = 40000; // 視界制限（無限追尾をやめて200ピクセル以内しか狙わない）
       apex[i].targetId = -1;
@@ -615,16 +621,15 @@ void setup() {
 }
 
 void loop() {
-  xSemaphoreTake(dataMutex, portMAX_DELAY);
-  
-  // 物理演算はすべてCore 0 (core0Task) の超高速ループへ完全移行しました！
-  // このloop()は画面を描画するだけの「純粋なレンダリングエンジン」になりました。
-
-  xSemaphoreGive(dataMutex);
-
   // ==========================================
   // --- Rendering (限界リッチ描画) ---
   // ==========================================
+  // 【意図的に緩い同期（テアリング許容）】
+  // ここで描画全体をミューテックスで囲むと、Core 1の重い描画処理中（数十ms）に
+  // Core 0の物理演算が完全にブロックされ、並列処理のメリットが死んで激重になります。
+  // そのため、見た目のシミュレーションとして割り切り、ロックを行わずに配列を読みます。
+  // （一瞬の座標ズレやテアリングは許容する、組み込み特有のパフォーマンス優先設計）
+  
   long t = millis();
   
   // 昼夜サイクル（ダイナミックライティング）
@@ -702,8 +707,19 @@ void loop() {
   }
 
   // 動物たちの描画（Herb -> Carn -> Apex）アンチエイリアス化
-  auto drawEntity = [&](Entity &e, uint8_t r, uint8_t g, uint8_t b, float len, float wid, bool infected = false) {
+  auto drawEntity = [&](Entity &e, uint8_t r, uint8_t g, uint8_t b, uint8_t tr, uint8_t tg, uint8_t tb, float len, float wid, bool infected = false) {
     if(!e.active) return;
+
+    // 長生きによる色の変化（歴戦のオーラ色へシフト）
+    float ageFactor = min(e.age / 5000.0f, 1.0f); // 約1.5分生存でMAX
+    uint8_t baseR = r; uint8_t baseG = g; uint8_t baseB = b;
+    if (infected) {
+      baseR = 180; baseG = 0; baseB = 255;
+    } else {
+      baseR = r + (int)((tr - r) * ageFactor);
+      baseG = g + (int)((tg - g) * ageFactor);
+      baseB = b + (int)((tb - b) * ageFactor);
+    }
     
     // しっぽの描画 (極限の軽量化：ステップスキップ＆無移動スキップ)
     int step = 3; // 3フレームごとに1本のWedgeLineを描画（描画負荷を約66%カット、見た目はそのまま）
@@ -714,8 +730,8 @@ void loop() {
       float hx1 = e.histX[idx1]; float hy1 = e.histY[idx1];
       float hx2 = e.histX[idx2]; float hy2 = e.histY[idx2];
       
-      if(hx1 == 0 && hy1 == 0) continue;
-      if(hx2 == 0 && hy2 == 0) continue;
+      if(hx1 < -50.0f || hy1 < -50.0f) continue;
+      if(hx2 < -50.0f || hy2 < -50.0f) continue;
       
       float distSq = (hx1-hx2)*(hx1-hx2) + (hy1-hy2)*(hy1-hy2);
       // ワープした線を描画しない
@@ -730,7 +746,7 @@ void loop() {
       if (factor1 < 0.05f && factor2 < 0.05f) continue;
 
       // 頭から尻尾にかけて滑らかに消えていく
-      uint16_t color = infected ? fadeColor(180, 0, 255, factor1) : fadeColor(r, g, b, factor1);
+      uint16_t color = fadeColor(baseR, baseG, baseB, factor1);
       
       // 尻尾の太さも滑らかに細くする
       float rad1 = wid * factor1;
@@ -742,16 +758,16 @@ void loop() {
     }
     
     // 頭部（とんがった形をやめて、丸く可愛らしい形に変更）
-    uint16_t headColor = e.flash > 0 ? TFT_WHITE : (infected ? myColor(180, 0, 255) : myColor(r, g, b));
+    uint16_t headColor = e.flash > 0 ? TFT_WHITE : myColor(baseR, baseG, baseB);
     if (e.flash > 0) e.flash -= 0.1f;
     
     img.fillSmoothCircle(e.x, e.y, wid, headColor);
   };
 
-  for(int i=0; i<MAX_DECOMPS; i++) drawEntity(decomps[i], 150, 255, 50, 4.0f, 2.5f, false); // 分解者はライムグリーン
-  for(int i=0; i<MAX_HERBS; i++) drawEntity(herbs[i], 0, 255, 255, 6.0f, 3.5f, herbs[i].infected);
-  for(int i=0; i<MAX_CARNS; i++) drawEntity(carns[i], 255, 50, 150, 8.0f, 4.5f, false);
-  for(int i=0; i<MAX_APEX; i++) drawEntity(apex[i], 255, 215, 0, 10.0f, 5.5f, false);
+  for(int i=0; i<MAX_DECOMPS; i++) drawEntity(decomps[i], 150, 255, 50, 0, 150, 0, 4.0f, 2.5f, false); // 分解者: ライム -> ディープグリーン
+  for(int i=0; i<MAX_HERBS; i++) drawEntity(herbs[i], 0, 255, 255, 50, 255, 50, 6.0f, 3.5f, herbs[i].infected); // 草食: シアン -> エメラルドグリーン
+  for(int i=0; i<MAX_CARNS; i++) drawEntity(carns[i], 255, 50, 150, 255, 120, 0, 8.0f, 4.5f, false); // 肉食: ピンク -> 燃えるオレンジ
+  for(int i=0; i<MAX_APEX; i++) drawEntity(apex[i], 255, 215, 0, 255, 0, 50, 10.0f, 5.5f, false); // 頂点: ゴールド -> クリムゾンレッド
 
   // パーティクル爆発の描画
   for(int p=0; p<MAX_PARTICLES; p++) {
