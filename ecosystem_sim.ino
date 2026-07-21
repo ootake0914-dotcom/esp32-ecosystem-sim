@@ -766,8 +766,8 @@ void loop() {
 
   for(int i=0; i<MAX_DECOMPS; i++) drawEntity(decomps[i], 150, 255, 50, 0, 150, 0, 4.0f, 2.5f, false); // 分解者: ライム -> ディープグリーン
   for(int i=0; i<MAX_HERBS; i++) drawEntity(herbs[i], 0, 255, 255, 50, 255, 50, 6.0f, 3.5f, herbs[i].infected); // 草食: シアン -> エメラルドグリーン
-  for(int i=0; i<MAX_CARNS; i++) drawEntity(carns[i], 255, 50, 150, 255, 120, 0, 8.0f, 4.5f, false); // 肉食: ピンク -> 燃えるオレンジ
-  for(int i=0; i<MAX_APEX; i++) drawEntity(apex[i], 255, 215, 0, 255, 0, 50, 10.0f, 5.5f, false); // 頂点: ゴールド -> クリムゾンレッド
+  for(int i=0; i<MAX_CARNS; i++) drawEntity(carns[i], 255, 50, 150, 255, 0, 0, 8.0f, 4.5f, false); // 肉食: ピンク -> ブラッドレッド（純赤）
+  for(int i=0; i<MAX_APEX; i++) drawEntity(apex[i], 255, 215, 0, 255, 255, 200, 10.0f, 5.5f, false); // 頂点: ゴールド -> プラチナ（白金）
 
   // パーティクル爆発の描画
   for(int p=0; p<MAX_PARTICLES; p++) {
