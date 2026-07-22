@@ -20,6 +20,8 @@ A highly optimized, high-performance artificial life / ecosystem simulation desi
   - **Garbage/Corpses (Dark X)**: Left behind when an animal dies.
   - **Decomposers (Lime)**: Nature's cleaners. They eat garbage and spores, eventually blossoming into new plants to complete the circle of life.
 - **Boids-like AI & Physics**: Entities have their own vision ranges, target tracking, fleeing mechanics, and kinetic movement with friction.
+- **Genetic Evolution (Altruism Gene)**: Entities inherit an `altruism` gene (0.0 to 1.0) with random mutations. Altruistic herbivores share energy with starving kin and self-isolate when infected by the virus! Run `sim.py` to watch altruistic herds naturally out-compete selfish ones over time.
+- **Veteran Color Shift**: As entities survive and age, their colors evolve into distinct "Veteran" forms to visually show their experience (e.g., Herbivores turn Emerald Green, Carnivores turn Blood Red, Apex Predators turn Platinum).
 - **Dynamic Tail Rendering**: Uses a custom highly-optimized `drawWedgeLine` algorithm to draw dynamic, fading tails for creatures based on their movement history, giving them a fluid, organic look.
 - **Zero-Player Game (Ambient Game)**: Just plug it in and watch the ecosystem balance itself out. Perfect as a desk toy!
 
