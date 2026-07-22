@@ -31,7 +31,7 @@ APEX_REP_COST = 200.0
 APEX_EAT_GAIN = 120.0
 
 class Entity:
-    def __init__(self, x, y, energy, speed_limit=1.0, infected=False):
+    def __init__(self, x, y, energy, speed_limit=1.0, infected=False, altruism=-1.0):
         self.x = x
         self.y = y
         self.vx = random.uniform(-1, 1)
@@ -39,6 +39,10 @@ class Entity:
         self.energy = energy
         self.speed_limit = speed_limit
         self.infected = infected
+        if altruism == -1.0:
+            self.altruism = random.random()
+        else:
+            self.altruism = max(0.0, min(1.0, altruism + random.uniform(-0.1, 0.1)))
 
 class Plant:
     def __init__(self, x, y):
@@ -200,6 +204,15 @@ def sim_step():
             h.vx += random.uniform(-0.1, 0.1)
             h.vy += random.uniform(-0.1, 0.1)
             
+        # Altruism: Energy sharing
+        for other in herbs:
+            if h != other:
+                if dist2(h, other) < 400 and not h.infected and not other.infected:
+                    if h.energy > 60 and other.energy < 30:
+                        if random.random() < h.altruism:
+                            h.energy -= 1.0
+                            other.energy += 1.0
+            
         for c in carns:
             dx = h.x - c.x
             dy = h.y - c.y
@@ -221,8 +234,14 @@ def sim_step():
                     h.vy += (dy/mag)*0.12
                     
         if h.infected:
-            h.vx += random.uniform(-0.5, 0.5)
-            h.vy += random.uniform(-0.5, 0.5)
+            if h.altruism > 0.6:
+                edge_x = -1.0 if h.x < WIDTH/2 else 1.0
+                edge_y = -1.0 if h.y < HEIGHT/2 else 1.0
+                h.vx = h.vx * 0.9 + edge_x * 0.1
+                h.vy = h.vy * 0.9 + edge_y * 0.1
+            else:
+                h.vx += random.uniform(-0.5, 0.5)
+                h.vy += random.uniform(-0.5, 0.5)
             h.energy -= 0.15
             
         speed = math.sqrt(h.vx**2 + h.vy**2)
@@ -243,7 +262,7 @@ def sim_step():
         if h.energy > 0:
             if h.energy > HERB_REP_THRESH and not h.infected and len(herbs)+len(new_herbs) < MAX_HERBS:
                 h.energy -= HERB_REP_COST
-                new_herbs.append(Entity(h.x, h.y, 80, max(0.3, min(2.0, h.speed_limit + random.uniform(-0.1, 0.1)))))
+                new_herbs.append(Entity(h.x, h.y, 80, max(0.3, min(2.0, h.speed_limit + random.uniform(-0.1, 0.1))), False, h.altruism))
             new_herbs.append(h)
         else:
             spawn_garbage(h.x, h.y)
@@ -383,6 +402,7 @@ def run_sim():
     hist_spores = []
     hist_decomps = []
     hist_garbages = []
+    hist_altruism = []
     
     steps = 30000
     for step in range(steps):
@@ -395,6 +415,8 @@ def run_sim():
             hist_spores.append(len(spores))
             hist_decomps.append(len(decomps))
             hist_garbages.append(len(garbages))
+            avg_alt = sum(h.altruism for h in herbs)/len(herbs) if herbs else 0
+            hist_altruism.append(avg_alt)
             
     print(f"Stats over {steps} ticks:")
     print(f"Plants: {sum(hist_plants)/len(hist_plants):.1f} / {MAX_PLANTS}")
@@ -403,24 +425,31 @@ def run_sim():
     print(f"Apexs:  {sum(hist_apexs)/len(hist_apexs):.1f} / {MAX_APEX}")
     print(f"Decomp: {sum(hist_decomps)/len(hist_decomps):.1f} / {MAX_DECOMPS}")
     print(f"Garbag: {sum(hist_garbages)/len(hist_garbages):.1f} / {MAX_GARBAGES}")
+    if hist_altruism:
+        print(f"Final Avg Altruism: {hist_altruism[-1]:.2f}")
 
     # Plot
-    plt.figure(figsize=(12, 6))
-    plt.plot(hist_plants, label='Plants', color='green')
-    plt.plot(hist_herbs, label='Herbivores', color='cyan')
-    plt.plot(hist_carns, label='Carnivores', color='hotpink')
-    plt.plot(hist_apexs, label='Apex', color='gold')
-    plt.plot(hist_spores, label='Spores', color='purple', linestyle='--')
-    plt.plot(hist_decomps, label='Decomposers', color='lime')
-    plt.plot(hist_garbages, label='Garbage', color='gray', linestyle=':')
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    ax1.plot(hist_plants, label='Plants', color='green')
+    ax1.plot(hist_herbs, label='Herbivores', color='cyan')
+    ax1.plot(hist_carns, label='Carnivores', color='hotpink')
+    ax1.plot(hist_apexs, label='Apex', color='gold')
+    ax1.plot(hist_spores, label='Spores', color='purple', linestyle='--')
+    ax1.plot(hist_decomps, label='Decomposers', color='lime')
+    ax1.plot(hist_garbages, label='Garbage', color='gray', linestyle=':')
     
-    plt.title('Ecosystem Population Dynamics (30,000 steps)')
-    plt.xlabel('Time (x50 steps)')
-    plt.ylabel('Population Count')
-    plt.legend(loc='upper right')
-    plt.grid(True, alpha=0.3)
+    ax2 = ax1.twinx()
+    ax2.plot(hist_altruism, label='Avg Altruism', color='blue', linestyle='-')
+    ax2.set_ylabel('Average Altruism (0.0 - 1.0)', color='blue')
+    
+    plt.title('Ecosystem Population Dynamics & Altruism Evolution')
+    ax1.set_xlabel('Time (x50 steps)')
+    ax1.set_ylabel('Population Count')
+    ax1.legend(loc='upper left')
+    ax2.legend(loc='upper right')
+    ax1.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig('ecosystem_plot.png')
+    plt.savefig('ecosystem_plot_altruism.png')
 
 if __name__ == '__main__':
     run_sim()

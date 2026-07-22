@@ -44,6 +44,7 @@ struct Entity {
   int targetId;
   float speedLimit;
   int age;
+  float altruism; // 利他性遺伝子 (0.0:利己的 〜 1.0:自己犠牲的)
 };
 
 struct Spore { bool active; float x, y, vx, vy; };
@@ -123,7 +124,7 @@ void spawnPlant() {
   }
 }
 
-void spawnHerb(float x, float y, float pSpeed = 0.8f) {
+void spawnHerb(float x, float y, float pSpeed = 0.8f, float pAltruism = -1.0f) {
   for(int i=0; i<MAX_HERBS; i++) {
     if(!herbs[i].active) {
       herbs[i].active = true;
@@ -134,6 +135,17 @@ void spawnHerb(float x, float y, float pSpeed = 0.8f) {
       float newSpeed = pSpeed + (random(0, 200) * (1.0f / 1000.0f)) - 0.1f;
       if(newSpeed < 0.3f) newSpeed = 0.3f; if(newSpeed > 2.0f) newSpeed = 2.0f;
       herbs[i].speedLimit = newSpeed;
+      
+      // 利他性の遺伝と突然変異
+      if (pAltruism == -1.0f) {
+        herbs[i].altruism = random(0, 100) * 0.01f; // 初代はランダム
+      } else {
+        float mutation = (random(-10, 11) * 0.01f); // ±0.1の突然変異
+        herbs[i].altruism = pAltruism + mutation;
+        if(herbs[i].altruism < 0.0f) herbs[i].altruism = 0.0f;
+        if(herbs[i].altruism > 1.0f) herbs[i].altruism = 1.0f;
+      }
+      
       initHistory(herbs[i], herbs[i].x, herbs[i].y);
       break;
     }
@@ -359,6 +371,17 @@ void core0Task(void * pvParameters) {
             if (distSq < 100 && distSq > 0) {
               herbs[i].vx -= (dX/distSq) * 2.0f; herbs[i].vy -= (dY/distSq) * 2.0f;
             }
+            // 【利他行動1】餌（エネルギー）の分け合い
+            if (distSq < 400 && !herbs[i].infected && !herbs[j].infected) {
+              if (herbs[i].energy > 60 && herbs[j].energy < 30) {
+                // 利他性が高いほど、高い確率でエネルギーを分け与える
+                if (random(0, 100) < herbs[i].altruism * 100.0f) { 
+                  herbs[i].energy -= 1.0f;
+                  herbs[j].energy += 1.0f;
+                  herbs[i].flash = 1.0f; // 分け与えた個体は白く光る
+                }
+              }
+            }
           }
         }
       }
@@ -419,7 +442,18 @@ void core0Task(void * pvParameters) {
       }
       
       if(herbs[i].infected) {
-        herbs[i].vx += (random(0, 100) * (1.0f / 100.0f)) - 0.5f; herbs[i].vy += (random(0, 100) * (1.0f / 100.0f)) - 0.5f;
+        // 【利他行動2】感染時の自主隔離
+        if (herbs[i].altruism > 0.6f) {
+          // 利他性が高い個体は、仲間にうつさないよう画面の隅（壁）へ向かおうとする
+          float edgeX = (herbs[i].x < TFT_WIDTH / 2) ? -1.0f : 1.0f;
+          float edgeY = (herbs[i].y < TFT_HEIGHT / 2) ? -1.0f : 1.0f;
+          herbs[i].vx = (herbs[i].vx * 0.9f) + (edgeX * 0.1f);
+          herbs[i].vy = (herbs[i].vy * 0.9f) + (edgeY * 0.1f);
+        } else {
+          // 利己的・普通の個体は構わずフラフラ歩き回る（パンデミックの原因になる）
+          herbs[i].vx += (random(0, 100) * (1.0f / 100.0f)) - 0.5f; 
+          herbs[i].vy += (random(0, 100) * (1.0f / 100.0f)) - 0.5f;
+        }
         herbs[i].energy -= 0.15f; 
         // 感染者はたまに紫パーティクルをこぼす
         if(random(0,100)<10) spawnExplosion(herbs[i].x, herbs[i].y, 180, 0, 255, 1, 0.2f); 
@@ -449,7 +483,7 @@ void core0Task(void * pvParameters) {
         }
       } else if (herbs[i].energy > 120 && !herbs[i].infected) {
         herbs[i].energy -= 50;
-        spawnHerb(herbs[i].x, herbs[i].y, herbs[i].speedLimit);
+        spawnHerb(herbs[i].x, herbs[i].y, herbs[i].speedLimit, herbs[i].altruism);
       }
     }
 
