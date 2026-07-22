@@ -45,6 +45,7 @@ struct Entity {
   float speedLimit;
   int age;
   float altruism; // 利他性遺伝子 (0.0:利己的 〜 1.0:自己犠牲的)
+  float immunity; // 免疫力遺伝子 (0.0:燃費良 〜 1.0:ウイルス耐性)
 };
 
 struct Spore { bool active; float x, y, vx, vy; };
@@ -124,7 +125,7 @@ void spawnPlant() {
   }
 }
 
-void spawnHerb(float x, float y, float pSpeed = 0.8f, float pAltruism = -1.0f) {
+void spawnHerb(float x, float y, float pSpeed = 0.8f, float pAltruism = -1.0f, float pImmunity = -1.0f) {
   for(int i=0; i<MAX_HERBS; i++) {
     if(!herbs[i].active) {
       herbs[i].active = true;
@@ -140,10 +141,18 @@ void spawnHerb(float x, float y, float pSpeed = 0.8f, float pAltruism = -1.0f) {
       if (pAltruism == -1.0f) {
         herbs[i].altruism = random(0, 100) * 0.01f; // 初代はランダム
       } else {
-        float mutation = (random(-10, 11) * 0.01f); // ±0.1の突然変異
-        herbs[i].altruism = pAltruism + mutation;
+        herbs[i].altruism = pAltruism + (random(-10, 11) * 0.01f);
         if(herbs[i].altruism < 0.0f) herbs[i].altruism = 0.0f;
         if(herbs[i].altruism > 1.0f) herbs[i].altruism = 1.0f;
+      }
+
+      // 免疫力の遺伝と突然変異
+      if (pImmunity == -1.0f) {
+        herbs[i].immunity = random(0, 100) * 0.01f; // 初代はランダム
+      } else {
+        herbs[i].immunity = pImmunity + (random(-10, 11) * 0.01f);
+        if(herbs[i].immunity < 0.0f) herbs[i].immunity = 0.0f;
+        if(herbs[i].immunity > 1.0f) herbs[i].immunity = 1.0f;
       }
       
       initHistory(herbs[i], herbs[i].x, herbs[i].y);
@@ -341,9 +350,14 @@ void core0Task(void * pvParameters) {
         if(herbs[h].active && !herbs[h].infected) {
           float dx = herbs[h].x - spores[i].x; float dy = herbs[h].y - spores[i].y;
           if(dx*dx + dy*dy < 36) { 
-            herbs[h].infected = true; herbs[h].flash = 1.0f;
             spores[i].active = false;
-            spawnExplosion(herbs[h].x, herbs[h].y, 180, 0, 255, 8, 1.0f); // 感染エフェクト
+            // 免疫力遺伝子による感染ブロック判定
+            if (random(0, 100) >= herbs[h].immunity * 100.0f) {
+              herbs[h].infected = true; herbs[h].flash = 1.0f;
+              spawnExplosion(herbs[h].x, herbs[h].y, 180, 0, 255, 8, 1.0f); // 感染エフェクト
+            } else {
+              spawnExplosion(herbs[h].x, herbs[h].y, 255, 255, 255, 3, 0.5f); // 免疫で弾いたエフェクト（白）
+            }
             break;
           }
         }
@@ -470,7 +484,10 @@ void core0Task(void * pvParameters) {
       if(herbs[i].y < 0) { herbs[i].y = 0; herbs[i].vy *= -1; }
       if(herbs[i].y > TFT_HEIGHT) { herbs[i].y = TFT_HEIGHT; herbs[i].vy *= -1; }
       
-      herbs[i].energy -= 0.04f * (herbs[i].speedLimit * (1.0f / 0.8f)); 
+      // 代謝（エネルギー消費）。スピードが速いほど、また免疫力が高いほど消費が激しい。
+      float energyDrain = 0.01f + 0.03f * herbs[i].speedLimit + 0.02f * herbs[i].immunity;
+      herbs[i].energy -= energyDrain; 
+      
       if(herbs[i].energy <= 0) {
         herbs[i].active = false;
         if(herbs[i].infected) {
@@ -483,7 +500,7 @@ void core0Task(void * pvParameters) {
         }
       } else if (herbs[i].energy > 120 && !herbs[i].infected) {
         herbs[i].energy -= 50;
-        spawnHerb(herbs[i].x, herbs[i].y, herbs[i].speedLimit, herbs[i].altruism);
+        spawnHerb(herbs[i].x, herbs[i].y, herbs[i].speedLimit, herbs[i].altruism, herbs[i].immunity);
       }
     }
 
@@ -493,7 +510,7 @@ void core0Task(void * pvParameters) {
       updateHistory(carns[i]);
       carns[i].age++;
       
-      float minDist = 99999;
+      float minDist = 10000; // 視界制限（半径100ピクセル以内しか狙わない。逃げ道を作る）
       carns[i].targetId = -1;
       for(int h=0; h<MAX_HERBS; h++) {
         if(herbs[h].active) { 
@@ -565,7 +582,7 @@ void core0Task(void * pvParameters) {
       updateHistory(apex[i]);
       apex[i].age++;
       
-      float minDist = 40000; // 視界制限（無限追尾をやめて200ピクセル以内しか狙わない）
+      float minDist = 14400; // 視界制限（半径120ピクセル以内しか狙わない）
       apex[i].targetId = -1;
       for(int c=0; c<MAX_CARNS; c++) {
         if(carns[c].active) {
