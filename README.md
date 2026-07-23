@@ -1,7 +1,7 @@
 # ESP32 Micro Ecosystem Simulator
 
 ### Real Hardware (ESP32 + 1.9" TFT)
-![Real ESP32 Hardware](esp32_hardware_demo.gif)
+![Real ESP32 Hardware](esp32_hardware_demo.mp4)
 
 ### Python Simulator
 ![Ecosystem Animation](ecosystem_anim_v2.gif)
