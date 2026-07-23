@@ -63,7 +63,8 @@ struct Garbage {
 
 SemaphoreHandle_t dataMutex;
 
-Entity plants[MAX_PLANTS];
+struct Plant { bool active; float x, y; };
+Plant plants[MAX_PLANTS];
 Entity herbs[MAX_HERBS];
 Entity carns[MAX_CARNS];
 Entity apex[MAX_APEX];
@@ -234,7 +235,6 @@ float Q_rsqrt( float number ) {
   i  = 0x5f3759df - ( i >> 1 );
   memcpy(&y, &i, sizeof(y)); // strict-aliasing違反回避
   y  = y * ( threehalfs - ( x2 * y * y ) );
-  // ESP32では 1.0f / sqrtf(number) の方が高速な可能性があるため将来的に要比較
   return y;
 }
 
@@ -727,21 +727,27 @@ void loop() {
   
   // レーザーサイト（捕食者の狙い）
   for(int i=0; i<MAX_CARNS; i++) {
-    if(carns[i].active && carns[i].targetId != -1) {
-      if(herbs[carns[i].targetId].active) {
-        float dx = carns[i].x - herbs[carns[i].targetId].x; float dy = carns[i].y - herbs[carns[i].targetId].y;
-        if(dx*dx + dy*dy < 1600) { // 近い時だけ赤いレーザー (AA)
-          img.drawWedgeLine(carns[i].x, carns[i].y, herbs[carns[i].targetId].x, herbs[carns[i].targetId].y, 0.5f, 0.5f, myColor(150, 0, 70));
+    if(carns[i].active) {
+      int tid = carns[i].targetId;
+      if(tid >= 0 && tid < MAX_HERBS) {
+        if(herbs[tid].active) {
+          float dx = carns[i].x - herbs[tid].x; float dy = carns[i].y - herbs[tid].y;
+          if(dx*dx + dy*dy < 1600) { // 近い時だけ赤いレーザー (AA)
+            img.drawWedgeLine(carns[i].x, carns[i].y, herbs[tid].x, herbs[tid].y, 0.5f, 0.5f, myColor(150, 0, 70));
+          }
         }
       }
     }
   }
   for(int i=0; i<MAX_APEX; i++) {
-    if(apex[i].active && apex[i].targetId != -1) {
-      if(carns[apex[i].targetId].active) {
-        float dx = apex[i].x - carns[apex[i].targetId].x; float dy = apex[i].y - carns[apex[i].targetId].y;
-        if(dx*dx + dy*dy < 4000) { // 黄金のレーザー (AA)
-          img.drawWedgeLine(apex[i].x, apex[i].y, carns[apex[i].targetId].x, carns[apex[i].targetId].y, 0.5f, 0.5f, myColor(200, 150, 0));
+    if(apex[i].active) {
+      int tid = apex[i].targetId;
+      if(tid >= 0 && tid < MAX_CARNS) {
+        if(carns[tid].active) {
+          float dx = apex[i].x - carns[tid].x; float dy = apex[i].y - carns[tid].y;
+          if(dx*dx + dy*dy < 4000) { // 黄金のレーザー (AA)
+            img.drawWedgeLine(apex[i].x, apex[i].y, carns[tid].x, carns[tid].y, 0.5f, 0.5f, myColor(200, 150, 0));
+          }
         }
       }
     }
@@ -787,8 +793,8 @@ void loop() {
       float distSq = (hx1-hx2)*(hx1-hx2) + (hy1-hy2)*(hy1-hy2);
       // ワープした線を描画しない
       if(distSq > 1000) continue;
-      // ほとんど動いていない場合は、同じ場所に何度も線を引かない（オーバードロー防止で負荷激減）
-      if(distSq < 0.1f && h > 0) continue; 
+      // ほとんど動いていない場合（1ピクセル未満）は、同じ場所に何度も線を引かない（負荷をさらに激減）
+      if(distSq < 1.0f && h > 0) continue; 
       
       float factor1 = 1.0f - ((float)h / HISTORY_LEN);
       float factor2 = 1.0f - ((float)next_h / HISTORY_LEN);
@@ -838,5 +844,6 @@ void loop() {
   }
   
   img.pushSprite(0, 0);
+  
   vTaskDelay(1 / portTICK_PERIOD_MS);
 }
