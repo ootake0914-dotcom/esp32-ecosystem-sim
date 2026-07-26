@@ -8,6 +8,24 @@
 
 A highly optimized, high-performance artificial life / ecosystem simulation designed to run on the ESP32 and a 1.9" TFT display (ST7789). Watch a completely autonomous, pixel-perfect ecosystem unfold in the palm of your hand!
 
+## Online Emulator (ESP32)
+
+You can try the simulation directly in your browser:
+[Run on Wokwi](https://wokwi.com/projects/470557640925776897)
+
+*Note: The code is highly optimized for the physical ESP32 hardware. Running it in a browser emulator may be slow and consume high CPU/Memory.*
+
+## Pure Python & Web Version (High-Res)
+
+Want to see the pure ecosystem logic without the ESP32 hardware limits? 
+We have spun off the Python implementation into its own dedicated repository! It features a high-resolution real-time GUI (Pygame) and runs smoothly on PC.
+
+**Play the WebAssembly version directly in your browser:**
+[Play Web Version](https://ootake0914-dotcom.github.io/ecosystem-sim/)
+
+**Check out the Python source code:**
+[ecosystem-sim (Python Repository)](https://github.com/ootake0914-dotcom/ecosystem-sim)
+
 ## Features
 
 - **Multi-Core Optimization**: Uses FreeRTOS to divide the workload. Core 0 handles the complex physics, collision detection, and AI logic, while Core 1 is strictly dedicated to pushing pixels to the TFT display via SPI.
@@ -49,15 +67,7 @@ A highly optimized, high-performance artificial life / ecosystem simulation desi
 4. Compile and flash to your ESP32.
 5. Watch the simulation run!
 
-## Python Simulator included!
 
-Want to test the balance of the ecosystem without flashing the ESP32? 
-Run the included `sim.py`! It simulates 30,000 steps of the ecosystem logic and generates a beautiful population dynamics graph (`ecosystem_plot.png`) using `matplotlib`.
-
-```bash
-pip install matplotlib
-python sim.py
-```
 
 ## Contributing
 Feel free to fork this project and add your own creatures, weather systems, or environmental mechanics. Let's make the most complex pocket ecosystem together!
