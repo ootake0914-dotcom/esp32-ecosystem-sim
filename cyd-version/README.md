@@ -2,6 +2,8 @@
 
 This directory contains the **Cheap Yellow Display (CYD / ESP32-2432S028)** port of the ESP32 Micro Ecosystem Simulator.
 
+![CYD Ecosystem Simulator Demo](cyd_demo.gif)
+
 ---
 
 ## Features
