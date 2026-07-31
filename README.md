@@ -26,6 +26,15 @@ We have spun off the Python implementation into its own dedicated repository! It
 **Check out the Python source code:**
 [ecosystem-sim (Python Repository)](https://github.com/ootake0914-dotcom/ecosystem-sim)
 
+## CYD (Cheap Yellow Display) Version
+
+Do you have a **Cheap Yellow Display (CYD / ESP32-2432S028)** board?
+We have created a dedicated port configured for the 2.8" TFT display and touch interface!
+
+**Check out the CYD version:**
+[cyd-version / cyd-ecosystem-sim](cyd-version/)
+
+
 ## Features
 
 - **Multi-Core Optimization**: Uses FreeRTOS to divide the workload. Core 0 handles the complex physics, collision detection, and AI logic, while Core 1 is strictly dedicated to pushing pixels to the TFT display via SPI.
