@@ -1,3 +1,16 @@
+# ESP32-2432S028R (CYD) Version
+
+This directory contains the standalone Arduino version configured specifically for the ESP32-2432S028R (Cheap Yellow Display).
+
+### Web Installer
+
+You can flash this version directly from your browser without installing the Arduino IDE:
+**[Web Installer Page](https://ootake0914-dotcom.github.io/esp32-ecosystem-sim/cyd-version/)**
+
+*(Requires Chrome, Edge, or a Web Serial compatible browser)*
+
+---
+
 # ESP32 Micro Ecosystem Simulator - CYD (Cheap Yellow Display) Version
 
 This directory contains the **Cheap Yellow Display (CYD / ESP32-2432S028)** port of the ESP32 Micro Ecosystem Simulator.
