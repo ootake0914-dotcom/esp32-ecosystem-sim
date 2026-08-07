@@ -1,0 +1,18 @@
+{
+  "name": "ESP32 Ecosystem Sim",
+  "version": "1.0.0",
+  "home_assistant_domain": "esp32-ecosystem-sim",
+  "funding_url": "https://github.com/ootake0914-dotcom",
+  "new_install_prompt_erasable": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "esp32-ecosystem-sim-full-4mb.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

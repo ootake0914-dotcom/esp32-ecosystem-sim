@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ESP32 Ecosystem Sim Web Installer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            background: #111;
+            color: #eee;
+            text-align: center;
+        }
+        h1 { color: #fff; }
+        p { line-height: 1.5; color: #ccc; }
+        esp-web-install-button {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>ESP32 Ecosystem Sim Web Installer</h1>
+    <p>Install the Ecosystem Simulation directly to your ESP32-2432S028R (CYD).</p>
+    
+    <p>Connect your CYD board via USB, click the button below, select the correct COM port, and click "Install".</p>
+    
+    <script type="module" src="https://unpkg.com/esp-web-tools@9.3.1/dist/web/install-button.js?module"></script>
+    <esp-web-install-button manifest="./manifest.json"></esp-web-install-button>
+
+    <p style="font-size: 0.8rem; margin-top: 3rem; color: #666;">
+        Requires a Web Serial compatible browser (Chrome, Edge, Opera).
+    </p>
+</body>
+</html>
