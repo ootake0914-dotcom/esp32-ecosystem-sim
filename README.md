@@ -80,3 +80,12 @@ We have created a dedicated port configured for the 2.8" TFT display and touch i
 
 ## Contributing
 Feel free to fork this project and add your own creatures, weather systems, or environmental mechanics. Let's make the most complex pocket ecosystem together!
+
+## Web Installer
+
+Flash directly to your CYD board from your Web Browser without installing Arduino IDE or any software!
+
+- **Web Installer Page**: [https://ootake0914-dotcom.github.io/esp32-ecosystem-sim/](https://ootake0914-dotcom.github.io/esp32-ecosystem-sim/)
+
+*(Requires Chrome, Edge, or any browser with Web Serial API support)*
+
